@@ -13,3 +13,6 @@
 # Supported formats
 
 ### To be added
+
+# TODO:
+move to struct?
