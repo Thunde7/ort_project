@@ -1,5 +1,5 @@
 from os.path import getsize
-import re 
+import sys 
 from typing import Dict
 
 from utils import formal_chunk, format_chunk
@@ -142,5 +142,15 @@ def find_files(zipfile):
         files[file] = find_file_data(zipfile,metadata["offset"])
     return(files)
 
+def print_format(files):
+
+    print("{")
+    for file, data in files.items():
+        print(f'{file} : {"{"}')
+        for entry, value in data.items():
+            print(f"\t{entry} : {value},")
+        print('\t},')
+    print("}")
 if __name__ == "__main__":
-    print(find_files("nexus.zip"))
+    files = find_files(sys.argv[1])
+    print_format(files)    
