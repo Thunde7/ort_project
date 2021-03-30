@@ -20,7 +20,7 @@ def find_file_data(zipfile,offset) -> Dict[str,str]:
     '''
     metadata = {}
     with open(zipfile,"rb") as input:
-        input.seek(offset,0)
+        input.seek(int(offset),0)
         metadata["sig"] = formal_chunk(input.read(4))
         metadata["ver"] = formal_chunk(input.read(2))
         metadata["gpflag"] = formal_chunk(input.read(2))
@@ -38,7 +38,7 @@ def find_file_data(zipfile,offset) -> Dict[str,str]:
         metadata["extra"] = extra
     return metadata
 
-def cdfh_parser(zipfile, offset) -> Dict[str, str]:
+def cdfh_parser(zipfile, offset) -> Dict[str, Dict[str, str]]:
     '''
     Parses the data in the central directory file header
     Args:
@@ -71,12 +71,12 @@ def cdfh_parser(zipfile, offset) -> Dict[str, str]:
                 filename_len = int(formal_chunk(input.read(2)),16) 
                 extra_len = int(formal_chunk(input.read(2)),16)
                 comment_len = int(formal_chunk(input.read(2)),16)
-                metadata["first disk index"] = int(formal_chunk(input.read(2)),16)
+                metadata["first disk index"] = str(int(formal_chunk(input.read(2)),16))
                 metadata["intattr"] = formal_chunk(input.read(2))
                 metadata["extattr"] = formal_chunk(input.read(4))
-                metadata["offset"] = int(formal_chunk(input.read(4)),16)
+                metadata["offset"] = str(int(formal_chunk(input.read(4)),16))
                 name = input.read(filename_len)
-                metadata["name"] =  name
+                metadata["name"] = str(name)
                 extra = formal_chunk(input.read(extra_len))
                 metadata["extra"] = extra
                 comment = formal_chunk(input.read(comment_len))
@@ -102,7 +102,7 @@ def eocd_parser(zipfile, offset) -> Dict[str, str]:
     '''
     metadata = {}
     with open(zipfile,"rb") as input:
-        input.seek(offset,2)
+        input.seek(int(offset),2)
         metadata["sig"] = formal_chunk(input.read(4))
         metadata["disk number"] = int(formal_chunk(input.read(2)),16)
         metadata["cdfh start disk"] = int(formal_chunk(input.read(2)),16)
