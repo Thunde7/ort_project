@@ -1,5 +1,6 @@
 from os.path import getsize
-import sys 
+import sys
+import math 
 from typing import Dict
 
 from utils import formal_chunk, format_chunk
@@ -133,14 +134,39 @@ def find_eocd(zipfile: str) -> int:
     return offset // 2 + 4
 
 
+
+def check_for_same_file_ref(data: Dict[str, Dict[str, str]]) -> bool:
+    offsets = set()
+    for file in data:
+        offsets.add(int(data[file]["offset"]))
+    if len(offsets) < len(data): # overlapping files
+        return True
+    diffs = set()
+    soffsets = sorted(list(offsets))
+    for i in range(len(soffsets)-1):
+        diffs.add(soffsets[i+1] - soffsets[i])
+    if len(diffs) <= (math.log(len(data)) + 1) ** 2: #quoting local file headers(filename len should differ with at most O(logn), 
+        return True                                  #                           but I wanted some more headroom)
+    return False
+
 def find_files(zipfile):
     eocd_offset = - find_eocd(zipfile) #offset from the end
     eocd_data = eocd_parser(zipfile,eocd_offset)
     cdfh_data = cdfh_parser(zipfile,eocd_data["cdfh offset"])
+    is_bomb = check_for_same_file_ref(cdfh_data)
     files = {}
     for file, metadata in cdfh_data.items():
         files[file] = find_file_data(zipfile,metadata["offset"])
-    return(files)
+    data = {
+        "name" : zipfile,
+        "eocd_offset" : eocd_offset,
+        "eocd_data" : eocd_data,
+        "cdfh_data" : cdfh_data,
+        "files" : files,
+        "is_bomb" : is_bomb
+    }
+    
+    return(data)
 
 def print_format(files):
 
@@ -152,5 +178,6 @@ def print_format(files):
         print('\t},')
     print("}")
 if __name__ == "__main__":
-    files = find_files(sys.argv[1])
-    print_format(files)    
+    data = find_files(sys.argv[1])
+    print(data)
+    #print_format(files)    
