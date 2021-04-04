@@ -35,7 +35,7 @@ class CentralDir():
         soffsets = sorted(list(offsets))
         for i in range(len(soffsets)-1):
             diffs.add(soffsets[i+1] - soffsets[i])
-        if len(diffs) <= (math.log(self.filecount) + 1) ** 2: return True
+        if len(diffs) < math.log(self.filecount): return True
         #quoting local file headers(filename len should differ with at most O(logn), but I wanted some more headroom)
         return False
 

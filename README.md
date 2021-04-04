@@ -1,18 +1,22 @@
 # Ort Project - To be named
 
-
 - Identify zip bombs and create them
-- Validate file content and find "injected" files
-- Inject files
-
 
 # Usage:
 
-### To be added
+python main.py ZIPFILE [-h] [-s] [-l]
 
-# Supported formats
+Zip static analyzer
 
-### To be added
+positional arguments:
+    ZIPFILE      The zip file to be analyzed
+
+optional arguments:
+    -h, --help   show this help message and exit
+    -s, --short  prints a short version of the zip analyzation
+    -l, --long   prints a short version of the zip analyzation
+
 
 # TODO:
 move to struct?
+GUI!

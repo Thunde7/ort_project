@@ -3,7 +3,7 @@
 #########
 from os.path import getsize
 from typing import List
-
+from functools import lru_cache
 
 from EOCD import EOCD
 from CentralDir import CentralDir
@@ -28,22 +28,47 @@ class Zipfile():
     def get_file_list(self) -> List[File]:
         return [self.files[name][1] for name in self.files]
 
+    @lru_cache
     def uncmprssd_size(self) -> int:
         size = 0
         for name in self.files:
             size += max(map(lambda item : item.uncmpressed, self.files[name]))
         return size
+    @lru_cache
+    def compressed_size(self) -> int:
+        size = 0
+        for name in self.files:
+            size += max(map(lambda item : item.compressed, self.files[name]))
+        return size
 
     def is_zipbomb(self) -> bool:
         if self.cdfh.check_for_same_file_ref():
+            print(1)
             return True
-        if (self.uncmprssd_size() / getsize(self.name) - DEFLATE_LIM) < EPSILON:
+        if abs(self.uncmprssd_size() / self.compressed_size() - DEFLATE_LIM) < EPSILON:
             return True
-        if any(file.get_ratio() - DEFLATE_LIM < EPSILON for file in self.get_file_list()):
+        if any(abs(file.get_ratio() - DEFLATE_LIM) < EPSILON for file in self.get_file_list()):
             return True
 
         return False
 
+    def short_str(self) -> str:
+        files = "\n".join(name for name in self.files)
+        ratio = self.uncmprssd_size() / self.compressed_size()
+        eocd_offset = self.eocd.offset
+
+        return(
+            f"""
+{self.name} :  {'{'}
+    {files}
+    cmpression ratio : {ratio}
+    uncmprssd : {self.uncmprssd_size()}
+    cmprssd : {self.compressed_size()}
+    EOCD offset(from EOF) : {eocd_offset}
+    CDFH offset : {self.cdfh_offset}
+{'}'}
+    """
+    )
 
 
     def __str__(self) -> str:
@@ -55,14 +80,14 @@ class Zipfile():
     {str(self.cdfh)},
     {str(self.eocd)}
 {'}'}            
-            """
-        )
+    """
+    )
 
 def main():
     zf = Zipfile("nexus.zip")
     #print(zf.uncmprssd_size())
-    #print(zf.is_zipbomb())
-    print(zf)
+    print(zf.is_zipbomb())
+    #print(zf)
 
 if __name__ == "__main__":
     main()

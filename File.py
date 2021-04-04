@@ -24,6 +24,10 @@ class File():
             self.ratio = self.uncmpressed / self.compressed                                    # Compression Ratio
 
 
+    def get_ratio(self) -> int:
+        return self.ratio
+
+
     def __str__(self) -> str:
         return (
         f"""
