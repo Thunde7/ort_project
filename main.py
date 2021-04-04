@@ -34,11 +34,10 @@ parser.add_argument(
 )
 
 
-
 def main() -> None:
     args = parser.parse_args()
     if args.short and args.long or not os.path.isfile(args.src):
-        raise argparse.ArgumentError(argument=None,message="U STUPID")
+        raise argparse.ArgumentError(argument=None, message="U STUPID")
     if args.long:
         return print(Zipfile(args.src))
     if args.short:
@@ -49,7 +48,6 @@ def main() -> None:
     if bomb:
         return print("It's a bomb!")
     return print("It's not a bomb")
-
 
 
 if __name__ == "__main__":

@@ -14,16 +14,15 @@ DEFLATE_LIM = 1032
 
 
 class Zipfile():
-    
-    def __init__(self,src) -> None:
+
+    def __init__(self, src) -> None:
         self.name = src
         self.eocd = EOCD(src)
         self.cdfh_offset = self.eocd.get_cdfh_offset()
-        self.cdfh = CentralDir(src,self.cdfh_offset)
+        self.cdfh = CentralDir(src, self.cdfh_offset)
         self.files = {}
-        for name,header in self.cdfh.get_files():
-            self.files[name] = (header, File(src,header.file_offset))
-
+        for name, header in self.cdfh.get_files():
+            self.files[name] = (header, File(src, header.file_offset))
 
     def get_file_list(self) -> List[File]:
         return [self.files[name][1] for name in self.files]
@@ -32,13 +31,14 @@ class Zipfile():
     def uncmprssd_size(self) -> int:
         size = 0
         for name in self.files:
-            size += max(map(lambda item : item.uncmpressed, self.files[name]))
+            size += max(map(lambda item: item.uncmpressed, self.files[name]))
         return size
+
     @lru_cache
     def compressed_size(self) -> int:
         size = 0
         for name in self.files:
-            size += max(map(lambda item : item.compressed, self.files[name]))
+            size += max(map(lambda item: item.compressed, self.files[name]))
         return size
 
     def is_zipbomb(self) -> bool:
@@ -68,8 +68,7 @@ class Zipfile():
     CDFH offset : {self.cdfh_offset}
 {'}'}
     """
-    )
-
+        )
 
     def __str__(self) -> str:
         files = "\n".join(str(file) for file in self.get_file_list())
@@ -81,13 +80,15 @@ class Zipfile():
     {str(self.eocd)}
 {'}'}            
     """
-    )
+        )
+
 
 def main():
     zf = Zipfile("nexus.zip")
-    #print(zf.uncmprssd_size())
+    # print(zf.uncmprssd_size())
     print(zf.is_zipbomb())
-    #print(zf)
+    # print(zf)
+
 
 if __name__ == "__main__":
     main()

@@ -2,19 +2,21 @@ import math
 
 from utils import formal_chunk
 
+
 class CentralDir():
     '''
     Holds the data in the CDFH in the zipfile(src)
     '''
+
     def __init__(self, src, offset) -> None:
         self.files = {}
         self.offset = offset
-        with open(src,"rb") as input:
-            input.seek(offset,0)
+        with open(src, "rb") as input:
+            input.seek(offset, 0)
             while True:
                 sig = formal_chunk(input.read(4))
                 if sig == "0x02014B50":
-                    file = CDFH_File(input,sig)
+                    file = CDFH_File(input, sig)
                     self.files[file.name] = file
                 else:
                     break
@@ -24,60 +26,74 @@ class CentralDir():
     def get_files(self):
         return self.files.items()
 
-
     def check_for_same_file_ref(self) -> bool:
         offsets = set()
         for _, cdheader in self.files.items():
             offsets.add(cdheader.get_header_offset())
-        if len(offsets) < self.filecount: # overlapping files
+        if len(offsets) < self.filecount:  # overlapping files
             return True
         diffs = set()
         soffsets = sorted(list(offsets))
         for i in range(len(soffsets)-1):
             diffs.add(soffsets[i+1] - soffsets[i])
-        if len(diffs) < math.log(self.filecount): return True
-        #quoting local file headers(filename len should differ with at most O(logn), but I wanted some more headroom)
+        if len(diffs) < math.log(self.filecount):
+            return True
+        # quoting local file headers(filename len should differ with at most O(logn), but I wanted some more headroom)
         return False
 
-
     def __str__(self) -> str:
-        return ( "CDFH : {\n" + "\n".join(str(file) for name, file in self.get_files()) + "\t\t\n}" )
-
+        return ("CDFH : {\n" + "\n".join(str(file) for name, file in self.get_files()) + "\t\t\n}")
 
 
 class CDFH_File():
     '''
     Holds the cdfh record for a specific file
     '''
-    def __init__(self,input,sig) -> None:
-        self.sig = sig                                                              # Central directory file header signature
-        self.zipver =                   formal_chunk(input.read(2))                 # Version made by
-        self.zipexver =                 formal_chunk(input.read(2))                 # Version needed to extract (minimum)
-        self.gpflag =                   formal_chunk(input.read(2))                 # General purpose bit flag
-        self.cmpmethod =                formal_chunk(input.read(2)[::-1])           # Compression method
-        self.lastmodtime =              formal_chunk(input.read(2))                 # File last modification time
-        self.lastmoddate =              formal_chunk(input.read(2))                 # File last modification date
-        self.crc =                      formal_chunk(input.read(4))                 # CRC-32 of uncompressed data
-        self.compressed =           int(formal_chunk(input.read(4)),16)             # Compressed size
-        self.uncmpressed =          int(formal_chunk(input.read(4)),16)             # Uncompressed size
-        filename_len =              int(formal_chunk(input.read(2)),16)             
-        extra_len =                 int(formal_chunk(input.read(2)),16)             
-        comment_len =               int(formal_chunk(input.read(2)),16)             
-        self.first_disk_index =     int(formal_chunk(input.read(2)),16)             # Disk number where file starts
-        self.intattr =                  formal_chunk(input.read(2))                 # Internal file attributes
-        self.extattr =                  formal_chunk(input.read(4))                 # External file attributes
-        self.file_offset =          int(formal_chunk(input.read(4)),16)             # Relative offset of local file header
-        self.name =                                 (input.read(filename_len)).decode("utf-8")      
-        self.extra =                    formal_chunk(input.read(extra_len))         
-        self.comment =                  formal_chunk(input.read(comment_len))       
-        self.ratio = self.uncmpressed / self.compressed                             # Compression Ratio
+
+    def __init__(self, input, sig) -> None:
+        # Central directory file header signature
+        self.sig = sig
+        self.zipver = formal_chunk(input.read(
+            2))                 # Version made by
+        # Version needed to extract (minimum)
+        self.zipexver = formal_chunk(input.read(2))
+        # General purpose bit flag
+        self.gpflag = formal_chunk(input.read(2))
+        self.cmpmethod = formal_chunk(input.read(
+            2)[::-1])           # Compression method
+        # File last modification time
+        self.lastmodtime = formal_chunk(input.read(2))
+        # File last modification date
+        self.lastmoddate = formal_chunk(input.read(2))
+        # CRC-32 of uncompressed data
+        self.crc = formal_chunk(input.read(4))
+        self.compressed = int(formal_chunk(input.read(4)),
+                              16)             # Compressed size
+        # Uncompressed size
+        self.uncmpressed = int(formal_chunk(input.read(4)), 16)
+        filename_len = int(formal_chunk(input.read(2)), 16)
+        extra_len = int(formal_chunk(input.read(2)), 16)
+        comment_len = int(formal_chunk(input.read(2)), 16)
+        # Disk number where file starts
+        self.first_disk_index = int(formal_chunk(input.read(2)), 16)
+        # Internal file attributes
+        self.intattr = formal_chunk(input.read(2))
+        # External file attributes
+        self.extattr = formal_chunk(input.read(4))
+        # Relative offset of local file header
+        self.file_offset = int(formal_chunk(input.read(4)), 16)
+        self.name = (input.read(filename_len)).decode("utf-8")
+        self.extra = formal_chunk(input.read(extra_len))
+        self.comment = formal_chunk(input.read(comment_len))
+        # Compression Ratio
+        self.ratio = self.uncmpressed / self.compressed
 
     def get_header_offset(self) -> int:
         return self.file_offset
 
     def __str__(self) -> str:
         return (
-        f"""
+            f"""
         {self.name} : {'{'} 
             Signature : {self.sig},
             Made by Zip Version : {self.zipver},
@@ -97,5 +113,3 @@ class CDFH_File():
             {'}'}
         """
         )
-
-

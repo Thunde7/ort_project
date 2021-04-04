@@ -1,36 +1,46 @@
 from utils import formal_chunk
 
+
 class File():
     '''
     Holds the file's metadata that can be read from the file header inside the 
     zip(src) file which starts at offset
     '''
-    def __init__(self, src, offset):
-        with open(src,"rb") as input:
-            input.seek(int(offset),0)
-            self.sig =              formal_chunk(input.read(4))                               # Local file header signature
-            self.zipver =           formal_chunk(input.read(2))                               # Version needed to extract (minimum)
-            self.gpflag =           formal_chunk(input.read(2))                               # General purpose bit flag
-            self.cmpmethod =        formal_chunk(input.read(2))                               # Compression method
-            self.lastmodtime =      formal_chunk(input.read(2))                               # File last modification time
-            self.lastmoddate =      formal_chunk(input.read(2))                               # File last modification date
-            self.crc =              formal_chunk(input.read(4))                               # CRC-32 of uncompressed data
-            self.compressed =   int(formal_chunk(input.read(4)),16)                           # Compressed size 
-            self.uncmpressed =  int(formal_chunk(input.read(4)),16)                           # Uncompressed size 
-            filename_len =      int(formal_chunk(input.read(2)),16)
-            extra_len =                      int(input.read(2).hex(),16)
-            self.name =                          input.read(filename_len).decode("utf-8")
-            self.extra =            formal_chunk(input.read(extra_len))                        
-            self.ratio = self.uncmpressed / self.compressed                                    # Compression Ratio
 
+    def __init__(self, src, offset):
+        with open(src, "rb") as input:
+            input.seek(int(offset), 0)
+            # Local file header signature
+            self.sig = formal_chunk(input.read(4))
+            # Version needed to extract (minimum)
+            self.zipver = formal_chunk(input.read(2))
+            # General purpose bit flag
+            self.gpflag = formal_chunk(input.read(2))
+            # Compression method
+            self.cmpmethod = formal_chunk(input.read(2))
+            # File last modification time
+            self.lastmodtime = formal_chunk(input.read(2))
+            # File last modification date
+            self.lastmoddate = formal_chunk(input.read(2))
+            # CRC-32 of uncompressed data
+            self.crc = formal_chunk(input.read(4))
+            # Compressed size
+            self.compressed = int(formal_chunk(input.read(4)), 16)
+            # Uncompressed size
+            self.uncmpressed = int(formal_chunk(input.read(4)), 16)
+            filename_len = int(formal_chunk(input.read(2)), 16)
+            extra_len = int(input.read(2).hex(), 16)
+            self.name = input.read(filename_len).decode("utf-8")
+            self.extra = formal_chunk(input.read(extra_len))
+            # Compression Ratio
+            self.ratio = self.uncmpressed / self.compressed
 
     def get_ratio(self) -> int:
         return self.ratio
 
-
     def __str__(self) -> str:
         return (
-        f"""
+            f"""
         {self.name} : {'{'} 
             Signature : {self.sig},
             Can be extracted by Zip Version : {self.zipver},
@@ -47,6 +57,3 @@ class File():
             {'}'}
         """
         )
-
-
-

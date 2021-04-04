@@ -1,7 +1,11 @@
-format_byte = lambda byte: r"\x" + byte[2:].upper() if len(byte) == 4 else r"\x0" + byte[2:].upper()
+def format_byte(byte): return r"\x" + \
+    byte[2:].upper() if len(byte) == 4 else r"\x0" + byte[2:].upper()
 
-strip_byte = lambda byte: format_byte(hex(byte))[2:]
 
-format_chunk = lambda chunk : [strip_byte(byte) for byte in chunk[::-1]]
+def strip_byte(byte): return format_byte(hex(byte))[2:]
 
-formal_chunk = lambda chunk : "0x" + "".join(format_chunk(chunk))
+
+def format_chunk(chunk): return [strip_byte(byte) for byte in chunk[::-1]]
+
+
+def formal_chunk(chunk): return "0x" + "".join(format_chunk(chunk))
