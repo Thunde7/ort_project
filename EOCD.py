@@ -5,15 +5,15 @@ class EOCD():
         self.find_eocd(src)
         with open(src,"rb") as input:
             input.seek(int(self.offset),2)
-            self.sig =             formal_chunk(input.read(4))
-            self.disk_number =     formal_chunk(input.read(2))
-            self.cdfh_start =      formal_chunk(input.read(2))
-            self.cdfh_count =  int(formal_chunk(input.read(2)),16)
-            self.total_cdfh =  int(formal_chunk(input.read(2)),16)
-            self.cdfh_size =   int(formal_chunk(input.read(4)),16)
-            self.cdfh_offset = int(formal_chunk(input.read(4)),16)
-            comment_len =      int(formal_chunk(input.read(2)),16)
-            self.comment =         formal_chunk(input.read(comment_len))
+            self.sig =             formal_chunk(input.read(4))              # End of central directory signature
+            self.disk_number =     formal_chunk(input.read(2))              # Number of this disk
+            self.cdfh_start =      formal_chunk(input.read(2))              # Disk where central directory starts
+            self.cdfh_count =  int(formal_chunk(input.read(2)),16)          # Number of central directory records on this disk
+            self.total_cdfh =  int(formal_chunk(input.read(2)),16)          # Total number of central directory records
+            self.cdfh_size =   int(formal_chunk(input.read(4)),16)          # Size of central directory (bytes)
+            self.cdfh_offset = int(formal_chunk(input.read(4)),16)          # Offset of start of central directory, relative to start of archive
+            comment_len =      int(formal_chunk(input.read(2)),16)          # Comment length (n)
+            self.comment =         formal_chunk(input.read(comment_len))    # Comment
 
     def find_eocd(self,src: str):
         '''
@@ -32,6 +32,21 @@ class EOCD():
 
     def get_cdfh_offset(self):
         return self.cdfh_offset
+
+    def __str__(self) -> str:
+        return (
+        f"""EOCD : {'{'} 
+            signature : {self.sig},
+            Disk Start Index : {self.disk_number},
+            CDFH Disk Start Index : {self.cdfh_start},
+            CDFH Count On Disk : {self.cdfh_count},
+            CDFH Total Count : {self.total_cdfh},
+            CDFH Size : {self.cdfh_size},
+            CDFH Offset : {self.cdfh_offset},
+            COMMENT : {self.comment}
+            {'}'}
+        """
+        )
 
 
 

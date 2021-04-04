@@ -38,38 +38,63 @@ class CentralDir():
         return False
 
 
+    def __str__(self) -> str:
+        return ( "CDFH : {\n" + "\n".join(str(file) for name, file in self.get_files()) + "\t\t\n}" )
+
+
 
 class CDFH_File():
     '''
     Holds the cdfh record for a specific file
     '''
     def __init__(self,input,sig) -> None:
-        self.sig = sig
-        self.zipver =                   formal_chunk(input.read(2))
-        self.zipexver =                 formal_chunk(input.read(2))
-        self.gpflag =                   formal_chunk(input.read(2))
-        self.cmpmethod =                formal_chunk(input.read(2))
-        self.lastmodtime =              formal_chunk(input.read(2))
-        self.lastmoddate =              formal_chunk(input.read(2))
-        self.crc =                      formal_chunk(input.read(4))
-        self.compressed =           int(formal_chunk(input.read(4)),16)
-        self.uncmpressed =          int(formal_chunk(input.read(4)),16)
-        filename_len =              int(formal_chunk(input.read(2)),16) 
-        extra_len =                 int(formal_chunk(input.read(2)),16)
-        comment_len =               int(formal_chunk(input.read(2)),16)
-        self.first_disk_index =     int(formal_chunk(input.read(2)),16)
-        self.intattr =                  formal_chunk(input.read(2))
-        self.extattr =                  formal_chunk(input.read(4))
-        self.file_offset =          int(formal_chunk(input.read(4)),16)
-        self.name =                              str(input.read(filename_len))
-        self.extra =                    formal_chunk(input.read(extra_len))
-        self.comment =                  formal_chunk(input.read(comment_len))
-        self.ratio = self.uncmpressed / self.compressed
+        self.sig = sig                                                              # Central directory file header signature
+        self.zipver =                   formal_chunk(input.read(2))                 # Version made by
+        self.zipexver =                 formal_chunk(input.read(2))                 # Version needed to extract (minimum)
+        self.gpflag =                   formal_chunk(input.read(2))                 # General purpose bit flag
+        self.cmpmethod =                formal_chunk(input.read(2)[::-1])           # Compression method
+        self.lastmodtime =              formal_chunk(input.read(2))                 # File last modification time
+        self.lastmoddate =              formal_chunk(input.read(2))                 # File last modification date
+        self.crc =                      formal_chunk(input.read(4))                 # CRC-32 of uncompressed data
+        self.compressed =           int(formal_chunk(input.read(4)),16)             # Compressed size
+        self.uncmpressed =          int(formal_chunk(input.read(4)),16)             # Uncompressed size
+        filename_len =              int(formal_chunk(input.read(2)),16)             
+        extra_len =                 int(formal_chunk(input.read(2)),16)             
+        comment_len =               int(formal_chunk(input.read(2)),16)             
+        self.first_disk_index =     int(formal_chunk(input.read(2)),16)             # Disk number where file starts
+        self.intattr =                  formal_chunk(input.read(2))                 # Internal file attributes
+        self.extattr =                  formal_chunk(input.read(4))                 # External file attributes
+        self.file_offset =          int(formal_chunk(input.read(4)),16)             # Relative offset of local file header
+        self.name =                                 (input.read(filename_len)).decode("utf-8")      
+        self.extra =                    formal_chunk(input.read(extra_len))         
+        self.comment =                  formal_chunk(input.read(comment_len))       
+        self.ratio = self.uncmpressed / self.compressed                             # Compression Ratio
 
     def get_header_offset(self) -> int:
         return self.file_offset
 
-
+    def __str__(self) -> str:
+        return (
+        f"""
+        {self.name} : {'{'} 
+            Signature : {self.sig},
+            Made by Zip Version : {self.zipver},
+            Can be extracted by Zip Version : {self.zipexver},
+            General Purpose Flag : {self.gpflag},
+            Compression method : {self.cmpmethod},
+            Last modification time : {self.lastmodtime},
+            Last modification date : {self.lastmoddate},
+            CRC of uncompressed data : {self.crc},
+            Compressed size : {self.compressed},
+            Uncompressed size : {self.uncmpressed},
+            Disk Start Index : {self.first_disk_index},
+            Name : {self.name},
+            Extra : {self.extra},
+            COMMENT : {self.comment},
+            Compresssion Ratio : {self.ratio}
+            {'}'}
+        """
+        )
 
 
 
