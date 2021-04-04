@@ -13,7 +13,6 @@ EPSILON = 100
 DEFLATE_LIM = 1032
 
 
-
 class Zipfile():
     
     def __init__(self,src) -> None:
@@ -44,7 +43,6 @@ class Zipfile():
             return True
 
         return False
-
 
 
 
