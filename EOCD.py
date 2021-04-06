@@ -1,4 +1,5 @@
 from os.path import getsize
+import struct
 
 from utils import formal_chunk
 
@@ -10,20 +11,20 @@ class EOCD():
             input.seek(int(self.offset), 2)
             # End of central directory signature
             self.sig = formal_chunk(input.read(4))
-            self.disk_number = formal_chunk(
-                input.read(2))              # Number of this disk
+            self.disk_number, = struct.unpack("<H",
+                                                input.read(2))              # Number of this disk
             # Disk where central directory starts
-            self.cdfh_start = formal_chunk(input.read(2))
+            self.cdfh_start, = struct.unpack("<H", input.read(2))
             # Number of central directory records on this disk
-            self.cdfh_count = int(formal_chunk(input.read(2)), 16)
+            self.cdfh_count, = struct.unpack("<H", input.read(2))
             # Total number of central directory records
-            self.total_cdfh = int(formal_chunk(input.read(2)), 16)
+            self.total_cdfh, = struct.unpack("<H", input.read(2))
             # Size of central directory (bytes)
-            self.cdfh_size = int(formal_chunk(input.read(4)), 16)
+            self.cdfh_size, = struct.unpack("<I", input.read(4))
             # Offset of start of central directory, relative to start of archive
-            self.cdfh_offset = int(formal_chunk(input.read(4)), 16)
-            comment_len = int(formal_chunk(input.read(2)),
-                              16)          # Comment length (n)
+            self.cdfh_offset, = struct.unpack("<I", input.read(4))
+            comment_len, = struct.unpack(
+                "<H", input.read(2))          # Comment length (n)
             self.comment = formal_chunk(input.read(comment_len))    # Comment
 
     def find_eocd(self, src: str):

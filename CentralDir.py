@@ -1,4 +1,5 @@
 import math
+import struct
 
 from utils import formal_chunk
 
@@ -56,35 +57,34 @@ class CDFH_File():
     def __init__(self, input, sig) -> None:
         # Central directory file header signature
         self.sig = sig
-        self.zipver = formal_chunk(input.read(
+        self.zipver, = struct.unpack("<H",input.read(
             2))                 # Version made by
         # Version needed to extract (minimum)
-        self.zipexver = formal_chunk(input.read(2))
+        self.zipexver, = struct.unpack("<H",input.read(2))
         # General purpose bit flag
         self.gpflag = formal_chunk(input.read(2))
         self.cmpmethod = formal_chunk(input.read(
             2)[::-1])           # Compression method
         # File last modification time
-        self.lastmodtime = formal_chunk(input.read(2))
+        self.lastmodtime, = struct.unpack("<H",input.read(2))
         # File last modification date
-        self.lastmoddate = formal_chunk(input.read(2))
+        self.lastmoddate, = struct.unpack("<H",input.read(2))
         # CRC-32 of uncompressed data
         self.crc = formal_chunk(input.read(4))
-        self.compressed = int(formal_chunk(input.read(4)),
-                                16)             # Compressed size
+        self.compressed, = struct.unpack("<I",input.read(4))             # Compressed size
         # Uncompressed size
-        self.uncmpressed = int(formal_chunk(input.read(4)), 16)
-        filename_len = int(formal_chunk(input.read(2)), 16)
-        extra_len = int(formal_chunk(input.read(2)), 16)
-        comment_len = int(formal_chunk(input.read(2)), 16)
+        self.uncmpressed, = struct.unpack("<I",input.read(4))
+        filename_len, = struct.unpack("<H",input.read(2))
+        extra_len, = struct.unpack("<H",input.read(2))
+        comment_len, = struct.unpack("<H",input.read(2))
         # Disk number where file starts
-        self.first_disk_index = int(formal_chunk(input.read(2)), 16)
+        self.first_disk_index, = struct.unpack("<H",input.read(2))
         # Internal file attributes
         self.intattr = formal_chunk(input.read(2))
         # External file attributes
         self.extattr = formal_chunk(input.read(4))
         # Relative offset of local file header
-        self.file_offset = int(formal_chunk(input.read(4)), 16)
+        self.file_offset, = struct.unpack("<I",input.read(4))
         self.name = (input.read(filename_len)).decode("utf-8")
         self.extra = formal_chunk(input.read(extra_len))
         self.comment = formal_chunk(input.read(comment_len))
