@@ -1,6 +1,7 @@
 #########
 #IMPORT$#
 #########
+import enum
 from os.path import getsize
 from typing import List
 from functools import lru_cache
@@ -11,6 +12,23 @@ from File import File
 
 EPSILON = 100
 DEFLATE_LIM = 1032
+
+
+class Bomb(enum.Enum):
+    CLEAR = ("The Archive is safe")
+    OVERLAPING_FILES = ("The Archive has overlapping files,\nIt's dangerous")
+    SAME_FILE_REF = (
+        "The Archive maps all files to the same file,\nIt's dangerous")
+    BIG_TOTAL_RATIO = (
+        "The Archive has an unusually big compression ratio,\nmight be dangerous")
+    FILE_WITH_BIG_RATIO = (
+        "The Archive has at least one file with an unusually big compression ratio,\nmight be dangerous")
+
+    def __init__(self, message) -> None:
+        self.message = message
+
+    def __str__(self) -> str:
+        return self.message
 
 
 class Zipfile():
@@ -41,16 +59,17 @@ class Zipfile():
             size += max(map(lambda item: item.compressed, self.files[name]))
         return size
 
-    def is_zipbomb(self) -> bool:
+    def is_zipbomb(self) -> Bomb:
+        if self.cdfh.check_for_overlaps():
+            return Bomb.OVERLAPING_FILES
         if self.cdfh.check_for_same_file_ref():
-            print(1)
-            return True
+            return Bomb.SAME_FILE_REF
         if abs(self.uncmprssd_size() / self.compressed_size() - DEFLATE_LIM) < EPSILON:
-            return True
+            return Bomb.BIG_TOTAL_RATIO
         if any(abs(file.get_ratio() - DEFLATE_LIM) < EPSILON for file in self.get_file_list()):
-            return True
+            return Bomb.FILE_WITH_BIG_RATIO
 
-        return False
+        return Bomb.CLEAR
 
     def short_str(self) -> str:
         files = "\n".join(name for name in self.files)

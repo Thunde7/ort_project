@@ -26,19 +26,22 @@ class CentralDir():
     def get_files(self):
         return self.files.items()
 
-    def check_for_same_file_ref(self) -> bool:
+    def check_for_overlaps(self) -> bool:
         offsets = set()
         for _, cdheader in self.files.items():
             offsets.add(cdheader.get_header_offset())
         if len(offsets) < self.filecount:  # overlapping files
             return True
+        return False        
+
+    def check_for_same_file_ref(self) -> bool:
         diffs = set()
-        soffsets = sorted(list(offsets))
+        soffsets = sorted(header.get_header_offset() for _, header in self.files.items())
         for i in range(len(soffsets)-1):
             diffs.add(soffsets[i+1] - soffsets[i])
         if len(diffs) < math.log(self.filecount):
             return True
-        # quoting local file headers(filename len should differ with at most O(logn), but I wanted some more headroom)
+        # quoting local file headers(filename len should differ with at most O(logn))
         return False
 
     def __str__(self) -> str:
@@ -68,7 +71,7 @@ class CDFH_File():
         # CRC-32 of uncompressed data
         self.crc = formal_chunk(input.read(4))
         self.compressed = int(formal_chunk(input.read(4)),
-                              16)             # Compressed size
+                                16)             # Compressed size
         # Uncompressed size
         self.uncmpressed = int(formal_chunk(input.read(4)), 16)
         filename_len = int(formal_chunk(input.read(2)), 16)

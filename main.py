@@ -37,17 +37,13 @@ parser.add_argument(
 def main() -> None:
     args = parser.parse_args()
     if args.short and args.long or not os.path.isfile(args.src):
-        raise argparse.ArgumentError(argument=None, message="U STUPID")
+        return print("You can't print a long and a short information")
     if args.long:
         return print(Zipfile(args.src))
     if args.short:
         zf = Zipfile(args.src)
         return print(zf.short_str())
-    zf = Zipfile(args.src)
-    bomb = zf.is_zipbomb()
-    if bomb:
-        return print("It's a bomb!")
-    return print("It's not a bomb")
+    print(Zipfile(args.src).is_zipbomb())
 
 
 if __name__ == "__main__":
