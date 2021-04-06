@@ -12,7 +12,8 @@ class EOCD():
             # End of central directory signature
             self.sig = formal_chunk(input.read(4))
             self.disk_number, = struct.unpack("<H",
-                                                input.read(2))              # Number of this disk
+                                              input.read(2))
+            # Number of this disk
             # Disk where central directory starts
             self.cdfh_start, = struct.unpack("<H", input.read(2))
             # Number of central directory records on this disk

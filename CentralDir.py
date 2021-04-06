@@ -33,11 +33,12 @@ class CentralDir():
             offsets.add(cdheader.get_header_offset())
         if len(offsets) < self.filecount:  # overlapping files
             return True
-        return False        
+        return False
 
     def check_for_same_file_ref(self) -> bool:
         diffs = set()
-        soffsets = sorted(header.get_header_offset() for _, header in self.files.items())
+        soffsets = sorted(header.get_header_offset()
+                          for _, header in self.files.items())
         for i in range(len(soffsets)-1):
             diffs.add(soffsets[i+1] - soffsets[i])
         if len(diffs) < math.log(self.filecount):
@@ -57,34 +58,35 @@ class CDFH_File():
     def __init__(self, input, sig) -> None:
         # Central directory file header signature
         self.sig = sig
-        self.zipver, = struct.unpack("<H",input.read(
+        self.zipver, = struct.unpack("<H", input.read(
             2))                 # Version made by
         # Version needed to extract (minimum)
-        self.zipexver, = struct.unpack("<H",input.read(2))
+        self.zipexver, = struct.unpack("<H", input.read(2))
         # General purpose bit flag
         self.gpflag = formal_chunk(input.read(2))
         self.cmpmethod = formal_chunk(input.read(
             2)[::-1])           # Compression method
         # File last modification time
-        self.lastmodtime, = struct.unpack("<H",input.read(2))
+        self.lastmodtime, = struct.unpack("<H", input.read(2))
         # File last modification date
-        self.lastmoddate, = struct.unpack("<H",input.read(2))
+        self.lastmoddate, = struct.unpack("<H", input.read(2))
         # CRC-32 of uncompressed data
         self.crc = formal_chunk(input.read(4))
-        self.compressed, = struct.unpack("<I",input.read(4))             # Compressed size
+        self.compressed, = struct.unpack(
+            "<I", input.read(4))             # Compressed size
         # Uncompressed size
-        self.uncmpressed, = struct.unpack("<I",input.read(4))
-        filename_len, = struct.unpack("<H",input.read(2))
-        extra_len, = struct.unpack("<H",input.read(2))
-        comment_len, = struct.unpack("<H",input.read(2))
+        self.uncmpressed, = struct.unpack("<I", input.read(4))
+        filename_len, = struct.unpack("<H", input.read(2))
+        extra_len, = struct.unpack("<H", input.read(2))
+        comment_len, = struct.unpack("<H", input.read(2))
         # Disk number where file starts
-        self.first_disk_index, = struct.unpack("<H",input.read(2))
+        self.first_disk_index, = struct.unpack("<H", input.read(2))
         # Internal file attributes
         self.intattr = formal_chunk(input.read(2))
         # External file attributes
         self.extattr = formal_chunk(input.read(4))
         # Relative offset of local file header
-        self.file_offset, = struct.unpack("<I",input.read(4))
+        self.file_offset, = struct.unpack("<I", input.read(4))
         self.name = (input.read(filename_len)).decode("utf-8")
         self.extra = formal_chunk(input.read(extra_len))
         self.comment = formal_chunk(input.read(comment_len))

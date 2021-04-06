@@ -18,5 +18,4 @@ optional arguments:
 
 
 # TODO:
-move to struct?
 GUI!

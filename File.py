@@ -14,23 +14,23 @@ class File():
             # Local file header signature
             self.sig = formal_chunk(input.read(4))
             # Version needed to extract (minimum)
-            self.zipver, = struct.unpack("<H",input.read(2))
+            self.zipver, = struct.unpack("<H", input.read(2))
             # General purpose bit flag
             self.gpflag = formal_chunk(input.read(2))
             # Compression method
             self.cmpmethod = formal_chunk(input.read(2))
             # File last modification time
-            self.lastmodtime, = struct.unpack("<H",input.read(2))
+            self.lastmodtime, = struct.unpack("<H", input.read(2))
             # File last modification date
-            self.lastmoddate, = struct.unpack("<H",input.read(2))
+            self.lastmoddate, = struct.unpack("<H", input.read(2))
             # CRC-32 of uncompressed data
             self.crc = formal_chunk(input.read(4))
             # Compressed size
-            self.compressed, = struct.unpack("<I",input.read(4))
+            self.compressed, = struct.unpack("<I", input.read(4))
             # Uncompressed size
-            self.uncmpressed, = struct.unpack("<I",input.read(4))
-            filename_len, = struct.unpack("<H",input.read(2))
-            extra_len, = struct.unpack("<H",input.read(2))
+            self.uncmpressed, = struct.unpack("<I", input.read(4))
+            filename_len, = struct.unpack("<H", input.read(2))
+            extra_len, = struct.unpack("<H", input.read(2))
             self.name = input.read(filename_len).decode("utf-8")
             self.extra = formal_chunk(input.read(extra_len))
             # Compression Ratio
