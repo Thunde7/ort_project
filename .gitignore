@@ -2,3 +2,4 @@ feature_paper/*
 *.zip
 __pycache__/*
 *.txt
+cr/*
