@@ -1,5 +1,6 @@
 feature_paper/*
 *.zip
+app/__pycache__/*
 __pycache__/*
 *.txt
 cr/*
