@@ -34,17 +34,12 @@ parser.add_argument(
 )
 
 
-def main() -> None:
+def main():
     args = parser.parse_args()
     if args.short and args.long or not os.path.isfile(args.src):
         return print("You can't print a long and a short information")
-    if args.long:
-        return print(Zipfile(args.src))
-    if args.short:
-        zf = Zipfile(args.src)
-        return print(zf.short_str())
-    print(Zipfile(args.src).is_zipbomb())
-
+    print_type = "long" if args.long else ("short" if args.short else None)
+    return print(Zipfile(args.src, print_type))
 
 if __name__ == "__main__":
     main()

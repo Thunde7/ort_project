@@ -14,13 +14,11 @@ class CentralDir():
         self.offset = offset
         with open(src, "rb") as input:
             input.seek(offset, 0)
-            while True:
+            sig = formal_chunk(input.read(4))
+            while sig == "0x02014B50":
+                file = CDFH_File(input, sig)
+                self.files[file.name] = file
                 sig = formal_chunk(input.read(4))
-                if sig == "0x02014B50":
-                    file = CDFH_File(input, sig)
-                    self.files[file.name] = file
-                else:
-                    break
 
         self.filecount = len(self.files)
 
@@ -29,18 +27,16 @@ class CentralDir():
 
     def check_for_overlaps(self) -> bool:
         offsets = set()
-        for _, cdheader in self.files.items():
+        for cdheader in self.files.values():
             offsets.add(cdheader.get_header_offset())
         if len(offsets) < self.filecount:  # overlapping files
             return True
         return False
 
     def check_for_same_file_ref(self) -> bool:
-        diffs = set()
         soffsets = sorted(header.get_header_offset()
-                          for _, header in self.files.items())
-        for i in range(len(soffsets)-1):
-            diffs.add(soffsets[i+1] - soffsets[i])
+                          for header in self.files.values())
+        diffs = {soffsets[i+1] - soffsets[i] for i in range(len(soffsets)-1)}
         if len(diffs) < math.log(self.filecount):
             return True
         # quoting local file headers(filename len should differ with at most O(logn))
