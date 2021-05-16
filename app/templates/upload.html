@@ -5,27 +5,35 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
     <link rel="stylesheet" href="../static/style.css">
+  <style>
+    .actions {
+      margin-top:15px;
+      margin-bottom:15px;
+    }
+    .actions .btn {
+      margin-right:10px;
+    }
+  </style>
   </head>
   <body>
     <div class="main-block">
       <h1>Upload</h1>
-      <hr>
       <form method="POST" enctype="multipart/form-data">
+        <hr>
+        <div class="actions">
+          <a href="../.." class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span>
+          Take Me Home </a>
+        </div>
+        <hr>
         <label id="icon" for="name"><i class="fas fa-user"></i></label>
         <input type="text" name="name" id="name" placeholder="Username" required/>
         <label id="icon" for="file"><i class="fas fa-file-archive"></i></label>
-        <input type="file" name="file", class="custom-file-input" id="file" required/>
+        <input type="file" name="file" class="custom-file-input" id="file" required/>
         <hr>
         <div class="btn-block">
-          <button type="submit", href="/">Submit</button>
+          <button type="submit" href="/">Submit</button>
         </div>
         <hr>
-        <div class="btn-block">
-        <button type="redirect", href="/..">Home</button>
-        </div>
-        <div class="btn-block">
-        <button type="redirect", href="/../results/">Previus results</button>
-        </div>
       </form>
     </div>
   </body>
