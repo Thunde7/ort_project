@@ -1,15 +1,16 @@
-from logging import error
-from typing import final
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect 
 import os
 from shutil import ExecError, rmtree
-from werkzeug.utils import redirect, secure_filename
+from flask.json import jsonify
+from werkzeug.utils import secure_filename
 
-import Zipfile
+from flask_wtf import FlaskForm
+from wtforms.fields import SelectField
+#import Zipfile
 
 app = Flask(__name__)
 
-
+app.config['SECRET_KEY'] = 'secret'
 UPLOAD_EXTENSIONS = [".zip"]
 UPLOADS = os.path.join(os.getcwd(),"..","uploads")
 
@@ -19,10 +20,10 @@ def is_vaild_file(filename):
            ("." + filename.split(".")[-1]) in UPLOAD_EXTENSIONS
            )
 
-try:
-    rmtree(UPLOADS)
-finally:
-    os.mkdir(UPLOADS)
+# try:
+#     rmtree(UPLOADS)
+# finally:
+#     os.mkdir(UPLOADS)
 
 app.config["UPLOAD_PATH"] = UPLOADS
 
@@ -51,19 +52,27 @@ def upload_file():
     else:
         return render_template("upload.html"), 200
 
-@app.route("/results/", methods=["GET"])
-def get_results():
-    username = request.args.get("username")
+class Form(FlaskForm):
+    files = SelectField("File",choices=[(0, "----------------No File Selected----------------")])
 
-    file_list = get_file_list()
+@app.route("/results/", methods=["GET", "POST"])
+def results():
+    form = Form()
+    form.files.choices = []
 
-    display_file_list(file_list)
+    if request.method == "POST":
+        return f"<h1>{form.username.value}/{form.files.name}</h1>"
 
-    chosen = get_chosen_file()
-
-    zf = Zipfile.Zipfile(chosen)
+    return render_template("results.html",form=form)
 
 
+@app.route("/user_files/<user>")
+def get_files(user):
+    defualt_files = [{"id" : 0, "name" : "----------------No File Selected----------------"}]
+    if not os.path.exists(os.path.join(UPLOADS,user)): print(5); return jsonify({"files": defualt_files})
+    return jsonify({
+        "files" : defualt_files + [{"id" : i+1, "name" : f}for i, f in enumerate(os.listdir(os.path.join(UPLOADS,user)))]
+        })
 
 
 
