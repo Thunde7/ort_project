@@ -4,124 +4,27 @@
     <title>Upload file</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
-    <style>
-      html, body {
-      display: flex;
-      justify-content: center;
-      height: 100%;
-      }
-      body, div, h1, form, input, p { 
-      padding: 0;
-      margin: 0;
-      outline: none;
-      font-family: Roboto, Arial, sans-serif;
-      font-size: 16px;
-      color: #666;
-      }
-      h1 {
-      padding: 10px 0;
-      font-size: 32px;
-      font-weight: 300;
-      text-align: center;
-      }
-      p {
-      font-size: 12px;
-      }
-      hr {
-      color: #a9a9a9;
-      opacity: 0.3;
-      }
-      .main-block {
-      max-width: 340px; 
-      min-height: 460px; 
-      padding: 10px 0;
-      margin: auto;
-      border-radius: 5px; 
-      border: solid 1px #ccc;
-      box-shadow: 1px 2px 5px rgba(0,0,0,.31); 
-      background: #ebebeb; 
-      }
-      form {
-      margin: 0 30px;
-      }
-      label#icon {
-      margin: 0;
-      border-radius: 5px 0 0 5px;
-      }
-      input[type=text], input[type=file]{
-      width: calc(100% - 57px);
-      height: 36px;
-      margin: 13px 0 0 -5px;
-      padding-left: 10px; 
-      border-radius: 0 5px 5px 0;
-      border: solid 1px #cbc9c9; 
-      box-shadow: 1px 2px 5px rgba(0,0,0,.09); 
-      background: #fff; 
-      }
-      #icon {
-      display: inline-block;
-      padding: 9.3px 15px;
-      box-shadow: 1px 2px 5px rgba(0,0,0,.09); 
-      background: #666; 
-      color: #fff;
-      text-align: center;
-      }
-      .btn-block {
-      margin-top: 10px;
-      text-align: center;
-      }
-      button {
-      width: 100%;
-      padding: 10px 0;
-      margin: 10px auto;
-      border-radius: 5px; 
-      border: none;
-      background: #666; 
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      }
-      button:hover {
-      background: #666;
-      }
-    .custom-file-input::-webkit-file-upload-button {
-      visibility: hidden;
-    }
-    .custom-file-input::before {
-      content: 'Select A File';
-      display: inline-block;
-      width: 105%;
-      height: 30px;
-      background: linear-gradient(top, #f9f9f9, #e3e3e3);
-      margin: 10px 0 0 -5px;
-      outline: none;
-      white-space: nowrap;
-      -webkit-user-select: none;
-      user-select: none;
-      cursor: pointer;
-      text-shadow: 1px 1px #fff;
-      font-weight: 700;
-      font-size: 10pt;
-    }
-    .custom-file-input:hover::before {
-      border-color: black;
-    }
-    .custom-file-input:active::before {
-      background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
-    }
-    </style>
+    <link rel="stylesheet" href="../static/style.css">
   </head>
   <body>
     <div class="main-block">
       <h1>Upload</h1>
-      <form action="" method="POST" enctype="multipart/form-data">
+      <hr>
+      <form method="POST" enctype="multipart/form-data">
         <label id="icon" for="name"><i class="fas fa-user"></i></label>
         <input type="text" name="name" id="name" placeholder="Username" required/>
         <label id="icon" for="file"><i class="fas fa-file-archive"></i></label>
-        <input type="file" name="file", class="custom-file-input" id="file" />
+        <input type="file" name="file", class="custom-file-input" id="file" required/>
         <hr>
         <div class="btn-block">
           <button type="submit", href="/">Submit</button>
+        </div>
+        <hr>
+        <div class="btn-block">
+        <button type="redirect", href="/..">Home</button>
+        </div>
+        <div class="btn-block">
+        <button type="redirect", href="/../results/">Previus results</button>
         </div>
       </form>
     </div>

@@ -1,3 +1,4 @@
+import shutil
 from flask import Flask, render_template, request, redirect 
 import os
 from shutil import ExecError, rmtree
@@ -36,17 +37,24 @@ def index():
 @app.route("/upload/", methods=["POST","GET"])
 def upload_file():
     if request.method == "POST":
-        print(555555555)
         try:
             user_file = request.files["file"]
-            username = request.args.get("username")
+            username = "aa"#request.args.get("username")
             
-            assert is_vaild_file(user_file)
+            assert is_vaild_file(user_file.filename)
 
-            user_file.save(os.path.join(UPLOADS,username,secure_filename(user_file.filename)))
-            redirect("/results/")
+            if not os.path.exists(os.path.join(UPLOADS,username)):
+                os.mkdir(os.path.join(UPLOADS,username))
 
-        except Exception:
+            if os.path.exists(os.path.join(UPLOADS,username,user_file.filename)):
+                os.remove(os.path.join(UPLOADS,username,user_file.filename))
+
+            with open(os.path.join(UPLOADS,username,secure_filename(user_file.filename)), "+wb") as f:
+                user_file.save(f)
+            return render_template("success.html")
+
+        except Exception as e:
+            print(e)
             return render_template("error_occurred.html"), 400
 
     else:
@@ -79,4 +87,4 @@ def get_files(user):
 
 @app.route("/error_occurred/", methods=["GET"])
 def display_error():
-    render_template("error_occurred.html")
+    return render_template("error_occurred.html")
