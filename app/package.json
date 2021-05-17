@@ -1,5 +1,5 @@
 {
-  "name": "BNB - Bomb Not Bomb",
+  "name": "BNB_Bomb_Not_Bomb",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,8 +18,10 @@
     }
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "classnames": "^2.2.6",
     "node-sass-chokidar": "^1.5.0",
+    "package": "^1.0.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-router-dom": "^5.2.0",

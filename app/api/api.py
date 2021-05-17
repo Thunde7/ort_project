@@ -32,7 +32,9 @@ file_data = api.model("file data",
                                 fields.String(
                                   description="the files name",
                                   Required=True
-                                )
+                                ),
+                              "file":
+                                {"description": "the file"}
                         })
 
 user_data = api.model("user data",
@@ -47,7 +49,8 @@ user_data = api.model("user data",
 @api.route('/file_upload/')
 class upload(Resource):
   @api.expect(file_data)
-  def post(self): #might need to be post
+  def post(self):
+    print(request.json)
     data = request.get_json()
     username = data.get("username")
     filename = data.get("filename")

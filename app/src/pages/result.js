@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { setupScrollReveal } from '../../assets/js/main.js';
+import { setupScrollReveal } from '../assets/js/main.js';
 
-import UploadForm from '../forms/UploadForm.js';
+import ResultForm from '../components/forms/ResultForm.js';
 
 class Hero extends Component {
   componentDidMount() {
@@ -22,11 +22,7 @@ class Hero extends Component {
                 </h1>
                 <p className="hero-paragraph is-revealing">{content}</p>
               </div>
-              <UploadForm className="hero-form" submit="Scan for me" />
-            </div>
-
-            <div className="hero-illustration">
-              <Illustration />
+              <ResultForm className="hero-form" submit="Scan for me" />
             </div>
           </div>
         </div>
