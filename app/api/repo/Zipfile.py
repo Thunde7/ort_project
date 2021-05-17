@@ -9,9 +9,9 @@ from functools import lru_cache
 
 from flask.json import jsonify
 
-from module.EOCD import EOCD
-from module.CentralDir import CentralDir
-from module.File import File
+from repo.EOCD import EOCD
+from repo.CentralDir import CentralDir
+from repo.File import File
 
 EPSILON = 100
 DEFLATE_LIM = 1032

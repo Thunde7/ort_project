@@ -1,5 +1,5 @@
 import struct
-from module.utils import formal_chunk
+from repo.utils import formal_chunk
 
 
 class File():

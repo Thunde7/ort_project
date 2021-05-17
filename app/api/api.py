@@ -1,4 +1,4 @@
-from module.Zipfile import Zipfile
+from repo.Zipfile import Zipfile
 import os
 
 from flask import Flask, request, redirect, jsonify
@@ -13,7 +13,7 @@ api = Api(app, title="BNB API",
 
 app.config['SECRET_KEY'] = 'secret'
 UPLOAD_EXTENSIONS = [".zip"]
-UPLOADS = os.path.join(os.getcwd(),"..","uploads")
+UPLOADS = os.path.join(os.getcwd(),"../..","uploads")
 
 def is_vaild_file(filename):
     return(filename and
@@ -106,7 +106,8 @@ class report(Resource):
 class FileList(Resource):
   @api.expect(user_data)
   def get(self):
-    user = werkzeug.secure_filename(request.arg.get("username"))
+    print(request)
+    user = werkzeug.secure_filename(request.args.get("username"))
 
     defualt_files = [{"id" : 0, "name" : "----------------No File Selected----------------"}]
     if not os.path.exists(os.path.join(UPLOADS,user)): print(5); return jsonify({"files": defualt_files})
@@ -115,3 +116,7 @@ class FileList(Resource):
         })
 
 
+@api.route('/time/')
+class t(Resource):
+  def get(self):
+    return jsonify({"time" : 55})
