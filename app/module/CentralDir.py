@@ -1,7 +1,7 @@
 import math
 import struct
 
-from utils import formal_chunk
+from module.utils import formal_chunk
 
 
 class CentralDir():
@@ -87,7 +87,7 @@ class CDFH_File():
         self.extra = formal_chunk(input.read(extra_len))
         self.comment = formal_chunk(input.read(comment_len))
         # Compression Ratio
-        self.ratio = self.uncmpressed / self.compressed
+        self.ratio = self.uncmpressed / self.compressed if self.compressed != 0 else float('inf')
 
     def get_header_offset(self) -> int:
         return self.file_offset
@@ -110,7 +110,25 @@ class CDFH_File():
             Name : {self.name},
             Extra : {self.extra},
             COMMENT : {self.comment},
-            Compresssion Ratio : {self.ratio}
+            Compresssion Ratio : {self.ratio if self.ratio != float('inf') else "NaN"}
             {'}'}
         """
         )
+
+    def to_dict(self):
+        return ({
+            "name" :self.name,
+            "Signature" : self.sig,
+            "Can be extracted by Zip Version" : self.zipexver,
+            "General Purpose Flag" : self.gpflag,
+            "Compression method" : self.cmpmethod,
+            "Last modification time" : self.lastmodtime,
+            "Last modification date" : self.lastmoddate,
+            "CRC of uncompressed data" : self.crc,
+            "Compressed size" : self.compressed,
+            "Uncompressed size" : self.uncmpressed,
+            "Disk Start Index" : self.first_disk_index,
+            "Extra" : self.extra,
+            "COMMENT" : {self.comment},
+            "Compresssion Ratio" : eval(self.ratio if self.ratio != float('inf') else "NaN")
+        })

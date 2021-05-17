@@ -6,9 +6,6 @@ def format_byte(byte):
 
 
 def strip_byte(byte):
-    '''
-    Strips the byte from his "\x" or "0x" prefix
-    '''
     return format_byte(hex(byte))[2:]
 
 

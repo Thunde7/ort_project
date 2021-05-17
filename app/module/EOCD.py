@@ -1,7 +1,7 @@
 from os.path import getsize
 import struct
 
-from utils import formal_chunk
+from module.utils import formal_chunk
 
 
 class EOCD():
@@ -60,3 +60,16 @@ class EOCD():
             {'}'}
         """
         )
+    
+    def to_dict(self):
+        return ({
+            "name" : self.name,
+            "signature" : self.sig,
+            "Disk Start Index" : self.disk_number,
+            "CDFH Disk Start Index" : self.cdfh_start,
+            "CDFH Count On Disk" : self.cdfh_count,
+            "CDFH Total Count" : self.total_cdfh,
+            "CDFH Size" : self.cdfh_size,
+            "CDFH Offset" : self.cdfh_offset,
+            "COMMENT" : self.comment
+        })

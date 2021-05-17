@@ -1,5 +1,5 @@
 import struct
-from utils import formal_chunk
+from module.utils import formal_chunk
 
 
 class File():
@@ -34,7 +34,7 @@ class File():
             self.name = input.read(filename_len).decode("utf-8")
             self.extra = formal_chunk(input.read(extra_len))
             # Compression Ratio
-            self.ratio = self.uncmpressed / self.compressed
+            self.ratio = self.uncmpressed / self.compressed if self.compressed != 0 else float('inf') 
 
     def get_ratio(self) -> int:
         return self.ratio
@@ -54,7 +54,23 @@ class File():
             Uncompressed size : {self.uncmpressed},
             Name : {self.name},
             Extra : {self.extra},
-            Compresssion Ratio : {self.ratio}
+            Compresssion Ratio : {self.ratio if self.ratio != float('inf') else "NaN"}
             {'}'}
         """
         )
+
+    def to_dict(self):
+        return ({
+            "name" :self.name,
+            "Signature" : self.sig,
+            "Can be extracted by Zip Version" : self.zipver,
+            "General Purpose Flag" : self.gpflag,
+            "Compression method" : self.cmpmethod,
+            "Last modification time" : self.lastmodtime,
+            "Last modification date" : self.lastmoddate,
+            "CRC of uncompressed data" : self.crc,
+            "Compressed size" : self.compressed,
+            "Uncompressed size" : self.uncmpressed,
+            "Extra" : self.extra,
+            "Compresssion Ratio" : eval(self.ratio if self.ratio != float('inf') else "NaN")
+        })

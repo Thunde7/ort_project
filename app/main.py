@@ -7,7 +7,8 @@ from werkzeug.utils import secure_filename
 
 from flask_wtf import FlaskForm
 from wtforms.fields import SelectField
-#import Zipfile
+from wtforms.fields.core import StringField
+import Zipfile
 
 app = Flask(__name__)
 
@@ -61,17 +62,14 @@ def upload_file():
         return render_template("upload.html"), 200
 
 class Form(FlaskForm):
+    username = StringField()
     files = SelectField("File",choices=[(0, "----------------No File Selected----------------")])
 
 @app.route("/results/", methods=["GET", "POST"])
 def results():
     form = Form()
-    form.files.choices = []
 
-    if request.method == "POST":
-        return f"<h1>{form.username.value}/{form.files.name}</h1>"
-
-    return render_template("results.html",form=form)
+    return redirect("/")
 
 
 @app.route("/user_files/<user>")
@@ -82,6 +80,11 @@ def get_files(user):
         "files" : defualt_files + [{"id" : i+1, "name" : f}for i, f in enumerate(os.listdir(os.path.join(UPLOADS,user)))]
         })
 
+@app.route("/<user>/<filename>")
+def get_data(user,filename):
+    filedir = os.path.join(UPLOADS,user,filename)
+    zf = Zipfile.Zipfile(filedir)
+    return jsonify(zf.to_json())
 
 
 

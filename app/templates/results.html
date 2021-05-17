@@ -12,19 +12,13 @@
     <form method="POST", enctype="multipart/form-data">
     {{ form.csrf_token }}
     <label id="icon" for="name"><i class="fas fa-user"></i></label>
-    <input type="text" name="name" id="username" placeholder="Username" required/>
+    {{form.username}}
     <label id="icon" for="files"><i class="fas fa-file-archive"></i></label>
-    {{ form.files }}
+    {{ form.files}}
     <div class="btn-block">
-      <button type="submit", href="/">Display</button>
+      <button type="submit", href="/" [disabled]="file_select.value == '0' || username">Display</button>
     </div>
     <hr>
-    <div class="btn-block">
-      <button type="redirect", href="/..">Home</button>
-    </div>
-    <div class="btn-block">
-      <button type="redirect", href="/../upload/">Upload a new file</button>
-    </div>
     </form>
     <script>
         var username = document.getElementById("username");

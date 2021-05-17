@@ -1,5 +1,6 @@
 feature_paper/*
 *.zip
+app/module/__pycache__/*
 app/__pycache__/*
 __pycache__/*
 *.txt

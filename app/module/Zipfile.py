@@ -3,12 +3,15 @@
 #########
 import enum
 from os.path import getsize
+from os import sep
 from typing import List
 from functools import lru_cache
 
-from EOCD import EOCD
-from CentralDir import CentralDir
-from File import File
+from flask.json import jsonify
+
+from module.EOCD import EOCD
+from module.CentralDir import CentralDir
+from module.File import File
 
 EPSILON = 100
 DEFLATE_LIM = 1032
@@ -33,14 +36,15 @@ class Bomb(enum.Enum):
 
 class Zipfile():
 
-    def __init__(self, src) -> None:
-        self.name = src
+    def __init__(self, src, print_type=None):
+        self.name = src.split(sep)[-1]
         self.eocd = EOCD(src)
         self.cdfh_offset = self.eocd.get_cdfh_offset()
         self.cdfh = CentralDir(src, self.cdfh_offset)
         self.files = {}
         for name, header in self.cdfh.get_files():
             self.files[name] = (header, File(src, header.file_offset))
+        self.print_type = print_type
 
     def get_file_list(self) -> List[File]:
         return [self.files[name][1] for name in self.files]
@@ -71,35 +75,43 @@ class Zipfile():
 
         return Bomb.CLEAR
 
-    def short_str(self) -> str:
-        files = "\n".join(name for name in self.files)
-        ratio = self.uncmprssd_size() / self.compressed_size()
-        eocd_offset = self.eocd.offset
-
-        return(
-            f"""
-{self.name} :  {'{'}
-    {files}
-    cmpression ratio : {ratio}
-    uncmprssd : {self.uncmprssd_size()}
-    cmprssd : {self.compressed_size()}
-    EOCD offset(from EOF) : {eocd_offset}
-    CDFH offset : {self.cdfh_offset}
-{'}'}
-    """
-        )
-
     def __str__(self) -> str:
-        files = "\n".join(str(file) for file in self.get_file_list())
-        return(
+        if self.print_type == "short":
+            files = "\n".join(name for name in self.files)
+            ratio = self.uncmprssd_size() / self.compressed_size()
+            eocd_offset = self.eocd.offset
+
+            return(
+            f"""
+            {self.name} :  {'{'}
+            files : {files}
+            cmpression ratio : {ratio}
+            uncmprssd : {self.uncmprssd_size()}
+            cmprssd : {self.compressed_size()}
+            EOCD offset(from EOF) : {eocd_offset}
+            CDFH offset : {self.cdfh_offset}
+            {'}'}
+            """
+            )
+        elif self.print_type == "long":
+            files = "\n".join(str(file) for file in self.get_file_list())
+            return(
             f"""
 {self.name} : {'{'}
-    {files},
-    {str(self.cdfh)},
+    files : {'{'}
+        {files}
+    {'}'},
+    cdfh : {'{'} {str(self.cdfh)},
     {str(self.eocd)}
 {'}'}            
     """
         )
+        else:
+            return str(self.is_zipbomb())
+
+    def to_dict(self):
+        return {"name" : self.name, "files" : [file.to_dict() for file in self.get_file_list()],
+                "CDFH" : self.cdfh.to_dict(), "EOCD" : self.eocd.to_dict(), "is_bomb" : str(self.is_zipbomb())}
 
 
 def main():

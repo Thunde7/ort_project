@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from Zipfile import Zipfile
+from module.Zipfile import Zipfile
 
 ######
 #ARGS#
