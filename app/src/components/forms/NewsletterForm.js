@@ -4,16 +4,16 @@ import classnames from 'classnames';
 class NewsletterForm extends Component {
   constructor(props) {
     super(props);
-    this.state = { email: '', selectedFile: null };
+    this.state = { username: '', filename: null };
   }
 
   onFileChange = (event) => {
-    this.setState({ selectedFile: event.target.files[0] });
+    this.setState({ filename: event.target.files[0] });
   };
 
   render() {
     const { className, submit = 'Submit' } = this.props;
-    const { email, selectedFile } = this.state;
+    const { username, filename } = this.state;
 
     return (
       <form
@@ -25,13 +25,16 @@ class NewsletterForm extends Component {
         <div className="control control-expanded">
           <input
             className="input"
-            type="email"
-            name="email"
-            placeholder="Your best email&hellip;"
+            type="file"
+            name="filename"
+            onChange={this.onFileChange}
           />
-          <div>
-            <input type="file" onChange={this.onFileChange} />
-          </div>
+          <input
+            className="input"
+            type="text"
+            name="username"
+            placeholder="Your username"
+          />
         </div>
         <div className="control">
           <button

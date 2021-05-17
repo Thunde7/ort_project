@@ -1,8 +1,7 @@
 {
-  "name": "holly_react",
+  "name": "BNB - Bomb Not Bomb",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://lukemcdonald.github.io/holly-react",
   "scripts": {
     "build-css": "node-sass-chokidar src/assets/css/scss/style.scss -o src/assets/css",
     "build": "react-scripts build",
