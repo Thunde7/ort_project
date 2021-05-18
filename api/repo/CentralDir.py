@@ -43,7 +43,10 @@ class CentralDir():
         return False
 
     def __str__(self) -> str:
-        return ("CDFH : {\n" + "\n".join(str(file) for name, file in self.get_files()) + "\t\t\n}")
+        return ("CDFH : {\n" + "\n".join(str(f) for _, f in self.get_files()) + "\t\t\n}")
+
+    def to_dict(self):
+        return {name : f.to_dict() for name, f in self.get_files()}
 
 
 class CDFH_File():
