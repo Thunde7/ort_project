@@ -1,6 +1,7 @@
 from repo.Zipfile import Zipfile
 import os
 
+from hashlib import md5
 from flask import Flask, request, redirect, jsonify, json
 from flask_restplus import Api, fields, Resource, model
 import werkzeug
@@ -35,7 +36,7 @@ def check_jwt(token):
 
     with open(USER_DB, "r") as db:
         users = json.load(db)["users"]
-        if username not in users or users[username] != password:
+        if username not in users or users[username] != md5(password.encode("utf-8")).hexdigest():
             return False
 
     return True
@@ -85,6 +86,13 @@ authed_user_data = api.model("authed user data",
                                  )
                              })
 
+@api.route('/token/')
+@api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
+class Token(Resource):
+    def get(self):
+        if not check_jwt(request.headers.get("Auth")):
+            return None, 401
+        return [], 200
 @api.route('/file_upload/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
 class upload(Resource):
@@ -185,7 +193,7 @@ class Login(Resource):
             users = json.load(db)["users"]
             if username not in users:
                 return "USER DOES NOT EXIST", 404
-            if users[username] != password:
+            if users[username] != md5(password.encode("utf-8")).hexdigest():
                 return "WRONG PASSWORD", 401
         return [{"Auth": create_jwt(username, password)}], 200
 
@@ -201,7 +209,7 @@ class SignUp(Resource):
             users = json.load(db)["users"]
             if username in users:
                 return "USER ALREADY EXISTS", 401
-            users[username] = password
+            users[username] = md5(password.encode("utf-8")).hexdigest()
             json.load(db)["users"]
 
         os.mkdir(os.path.join(UPLOADS, username))
