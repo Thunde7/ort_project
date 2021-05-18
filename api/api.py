@@ -95,7 +95,7 @@ class Token(Resource):
         return [], 200
 @api.route('/file_upload/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
-class upload(Resource):
+class Upload(Resource):
     @api.expect(file_data)
     def post(self):
         print(request.json)
@@ -130,9 +130,9 @@ class upload(Resource):
         return ["Saved successfully"], 200
 
 
-@api.route('/file_get_report')
+@api.route('/file_get_report/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
-class report(Resource):
+class Report(Resource):
     @api.expect(file_data)
     def get(self):
         username = request.args.get("username")
@@ -199,7 +199,7 @@ class Login(Resource):
 
 
 @api.route("/signup/")
-class SignUp(Resource):
+class Signup(Resource):
     @api.expect(user_data)
     def post(self):
         data = request.get_json()
