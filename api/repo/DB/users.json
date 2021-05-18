@@ -1,0 +1,4 @@
+{
+  "users" : {"a" : "aaaa"},
+  "files" : {"a" : ["RavenDB-5.1.6-windows-x64.zip","solid.zip"]}
+}
