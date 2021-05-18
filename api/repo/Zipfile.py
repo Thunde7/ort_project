@@ -7,8 +7,6 @@ from os import sep
 from typing import List
 from functools import lru_cache
 
-from flask.json import jsonify
-
 from repo.EOCD import EOCD
 from repo.CentralDir import CentralDir
 from repo.File import File

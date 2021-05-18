@@ -1,4 +1,3 @@
-from base64 import b64decode
 from repo.Zipfile import Zipfile
 import os
 
@@ -67,7 +66,7 @@ user_data = api.model("user data",
                       {
                           "username":
                           fields.String(
-                              description="The folder name associated with this user",
+                              description="The user's name",
                               Required=True
                           ),
                           "password":
@@ -77,6 +76,14 @@ user_data = api.model("user data",
                           )
                       })
 
+authed_user_data = api.model("authed user data",
+                             {
+                                 "username":
+                                 fields.String(
+                                     description="The folder name associated with this user",
+                                     Required=True
+                                 )
+                             })
 
 @api.route('/file_upload/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
@@ -112,7 +119,7 @@ class upload(Resource):
         with open(filepath, "+wb") as f:
             rfile.save(f)
 
-        return "Saved successfully", 200
+        return ["Saved successfully"], 200
 
 
 @api.route('/file_get_report')
@@ -131,14 +138,14 @@ class report(Resource):
 
         userpath = os.path.join(UPLOADS, username)
         if not os.path.exists(userpath):
-            return "USER NOT FOUND", 404
+            return None, 404
 
         filepath = os.path.join(userpath, filename)
         if not os.path.exists(filepath):
-            return "FILE NOT FOUND", 404
+            return None, 404
 
         if not is_vaild_file(filename):
-            return "BAD FILE NAME"
+            return None, 401
 
         zf = Zipfile.Zipfile(filepath)
 
@@ -148,7 +155,7 @@ class report(Resource):
 @api.route('/user_file_list/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
 class FileList(Resource):
-    @api.expect(user_data)
+    @api.expect(authed_user_data)
     def get(self):
         print(request)
         if not check_jwt(request.headers.get("Auth")):

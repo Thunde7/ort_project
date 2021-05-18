@@ -1,7 +1,6 @@
 import struct
 from repo.utils import formal_chunk
 
-
 class File():
     '''
     Holds the file's metadata that can be read from the file header inside the 
