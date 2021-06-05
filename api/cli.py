@@ -30,7 +30,7 @@ parser.add_argument(
     "--long",
     required=False,
     action="store_true",
-    help="prints a short version of the zip analyzation"
+    help="prints a long version of the zip analyzation"
 )
 
 

@@ -1,24 +1,27 @@
+from re import I
 from repo.Zipfile import Zipfile
 import os
 
 from hashlib import md5
 from flask import Flask, request, redirect, jsonify, json
 from flask_restplus import Api, fields, Resource, model
+from flask_cors import CORS
 import werkzeug
 import jwt
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app, title="BNB API",
-          version="unknown",
+          version="0.1.0",
           doc='/api/doc/',
           base_url='/')
 
 secret = "secret"
 
 app.config['SECRET_KEY'] = 'secret'
-USER_DB = os.path.join("repo", "DB", "users.json")
+USER_DB = os.path.join("DB", "users.json")
 UPLOAD_EXTENSIONS = [".zip"]
-UPLOADS = os.path.join(os.getcwd(), "../..", "uploads")
+UPLOADS = os.path.join(os.getcwd(), "uploads")
 
 
 def create_jwt(username, password):
@@ -54,7 +57,6 @@ file_data = api.model("file data",
                           "username":
                           fields.String(
                               description="The folder name associated with this user",
-                              Required=True
                           ),
                           "filename":
                           fields.String(
@@ -77,6 +79,30 @@ user_data = api.model("user data",
                           )
                       })
 
+signup_data = api.model("sign up data",
+                      {
+                          "username":
+                          fields.String(
+                              description="The user's name",
+                              Required=True
+                          ),
+                          "password":
+                          fields.String(
+                              description="The user's password",
+                              Required=True
+                          ),
+                         "firstname":
+                          fields.String(
+                              description="The user's first name",
+                              Required=True
+                          ),
+                          "lastname":
+                          fields.String(
+                              description="The user's last name",
+                              Required=True
+                          )
+                      })
+
 authed_user_data = api.model("authed user data",
                              {
                                  "username":
@@ -93,7 +119,9 @@ class Token(Resource):
         if not check_jwt(request.headers.get("Auth")):
             return None, 401
         return [], 200
-@api.route('/file_upload/')
+
+
+@api.route('/file-upload/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
 class Upload(Resource):
     @api.expect(file_data)
@@ -130,7 +158,7 @@ class Upload(Resource):
         return ["Saved successfully"], 200
 
 
-@api.route('/file_get_report/')
+@api.route('/file-get-report/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
 class Report(Resource):
     @api.expect(file_data)
@@ -140,6 +168,9 @@ class Report(Resource):
 
         if username in None or filename is None:
             return None, 400
+
+        if not check_jwt(request.headers.get("Auth")):
+            return None, 401
 
         username = werkzeug.secure_filename(username)
         filename = werkzeug.secure_filename(filename)
@@ -160,7 +191,7 @@ class Report(Resource):
         return jsonify(zf.to_json()), 200
 
 
-@api.route('/user_file_list/')
+@api.route('/user-file-list/')
 @api.doc(params={'Auth': {'in': 'header', 'description': 'jwt token'}})
 class FileList(Resource):
     @api.expect(authed_user_data)
@@ -170,13 +201,10 @@ class FileList(Resource):
             return None, 401
         user = werkzeug.secure_filename(request.args.get("username"))
 
-        defualt_files = [
-            {"id": 0, "name": "----------------No File Selected----------------"}]
         if not os.path.exists(os.path.join(UPLOADS, user)):
-            print(5)
-            return jsonify({"files": defualt_files})
+            return jsonify({"files": []})
         return jsonify({
-            "files": defualt_files + [{"id": i+1, "name": f}for i, f in enumerate(os.listdir(os.path.join(UPLOADS, user)))]
+            "files": [{"id": i+1, "name": f} for i, f in enumerate(os.listdir(os.path.join(UPLOADS, user)))]
         })
 
 
@@ -185,32 +213,51 @@ class Login(Resource):
     @api.expect(user_data)
     def post(self):
         print(request.json)
-        data = request.get_json()
-        username = werkzeug.secure_filename(data.get("username"))
+        data = request.get_json()["data"]
+        username = data.get("username")
         password = data.get("password")
+
+        if username is None or password is None:
+            return None, 401
+
+        username = werkzeug.secure_filename(username)
 
         with open(USER_DB, "r") as db:
             users = json.load(db)["users"]
             if username not in users:
                 return "USER DOES NOT EXIST", 404
-            if users[username] != md5(password.encode("utf-8")).hexdigest():
+            if users[username]["password"] != md5(password.encode("utf-8")).hexdigest():
                 return "WRONG PASSWORD", 401
         return [{"Auth": create_jwt(username, password)}], 200
 
 
 @api.route("/signup/")
 class Signup(Resource):
-    @api.expect(user_data)
+    @api.expect(signup_data)
     def post(self):
-        data = request.get_json()
-        username = werkzeug.secure_filename(data.get("username"))
+        print(request.json)
+        data = request.get_json()['data']
+        username = data.get("username")
         password = data.get("password")
+        firstname = data.get("firstname")
+        lastname = data.get("lastname")
+
+        print(request)
+
+        if None in {username, password, firstname, lastname}:
+            return None, 403
+
+        username = werkzeug.secure_filename(username)
+
         with open(USER_DB, "r") as db:
-            users = json.load(db)["users"]
-            if username in users:
-                return "USER ALREADY EXISTS", 401
-            users[username] = md5(password.encode("utf-8")).hexdigest()
-            json.load(db)["users"]
+            data = json.loads(db.read())
+        if username in data["users"]:
+            return "USER ALREADY EXISTS", 401
+        data["users"][username] = {"password" : md5(password.encode("utf-8")).hexdigest(),
+                                   "firstname" : firstname, "lastname": lastname }
+        with open(USER_DB,"w") as db:
+            db.write(json.dumps(data, indent=2))
+            
 
         os.mkdir(os.path.join(UPLOADS, username))
 

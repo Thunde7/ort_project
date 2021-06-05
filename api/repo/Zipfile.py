@@ -80,7 +80,7 @@ class Zipfile():
             eocd_offset = self.eocd.offset
 
             return(
-            f"""
+                f"""
             {self.name} :  {'{'}
             files : {files}
             cmpression ratio : {ratio}
@@ -94,7 +94,7 @@ class Zipfile():
         elif self.print_type == "long":
             files = "\n".join(str(file) for file in self.get_file_list())
             return(
-            f"""
+                f"""
 {self.name} : {'{'}
     files : {'{'}
         {files}
@@ -103,20 +103,22 @@ class Zipfile():
     {str(self.eocd)}
 {'}'}            
     """
-        )
+            )
         else:
             return str(self.is_zipbomb())
 
     def to_dict(self):
-        return {"name" : self.name, "files" : [file.to_dict() for file in self.get_file_list()],
-                "CDFH" : self.cdfh.to_dict(), "EOCD" : self.eocd.to_dict(), "is_bomb" : str(self.is_zipbomb())}
+        return {"name": self.name, "files": [file.to_dict() for file in self.get_file_list()],
+                "CDFH": self.cdfh.to_dict(), "EOCD": self.eocd.to_dict(), "compressedSize": self.compressed_size,
+                "uncompressedSize": self.uncmprssd_size, "isBomb": str(self.is_zipbomb())}
 
 
 def main():
-    zf = Zipfile("nexus.zip")
+    #zf = Zipfile("nexus.zip")
     # print(zf.uncmprssd_size())
-    print(zf.is_zipbomb())
+    # print(zf.is_zipbomb())
     # print(zf)
+    pass
 
 
 if __name__ == "__main__":

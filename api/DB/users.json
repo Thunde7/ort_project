@@ -1,4 +1,25 @@
 {
-  "users" : {"a" : "74b87337454200d4d33f80c4663dc5e5"},
-  "files" : {"a" : ["RavenDB-5.1.6-windows-x64.zip","solid.zip"]}
+  "files": {
+    "a": [
+      "RavenDB-5.1.6-windows-x64.zip",
+      "solid.zip"
+    ]
+  },
+  "users": {
+    "a": {
+      "firstname": "a",
+      "lastname": "a",
+      "password": "74b87337454200d4d33f80c4663dc5e5"
+    },
+    "bomber": {
+      "firstname": "Omri",
+      "lastname": "Chen",
+      "password": "d8578edf8458ce06fbc5bb76a58c5ca4"
+    },
+    "king": {
+      "firstname": "shimi",
+      "lastname": "tavori",
+      "password": "202cb962ac59075b964b07152d234b70"
+    }
+  }
 }
