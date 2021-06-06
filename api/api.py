@@ -7,6 +7,7 @@ from flask import Flask, request, redirect, jsonify, json
 from flask_restplus import Api, fields, Resource, model
 from flask_cors import CORS
 import werkzeug
+import base64
 import jwt
 
 app = Flask(__name__)
@@ -63,6 +64,11 @@ file_data = api.model("file data",
                               description="The files name",
                               Required=True
                           ),
+                          "file":
+                          fields.String(
+                              description="The file encoded in base64",
+                              Required=True
+                          )
                       })
 
 user_data = api.model("user data",
@@ -135,7 +141,7 @@ class Upload(Resource):
         filename = data.get("filename")
         rfile = data.get("file")
 
-        if username in None or filename is None:
+        if None in {username, filename, rfile}:
             return None, 400
 
         username = werkzeug.secure_filename(username)
@@ -152,8 +158,10 @@ class Upload(Resource):
         if os.path.exists(filepath):
             os.remove(filepath)
 
-        with open(filepath, "+wb") as f:
-            rfile.save(f)
+        file_data = base64.b64decode(rfile)
+
+        with open(filepath, "wb") as f:
+            f.write(file_data)
 
         return ["Saved successfully"], 200
 
