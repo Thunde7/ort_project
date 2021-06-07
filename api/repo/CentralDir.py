@@ -46,7 +46,7 @@ class CentralDir():
         return ("CDFH : {\n" + "\n".join(str(f) for _, f in self.get_files()) + "\t\t\n}")
 
     def to_dict(self):
-        return {name : f.to_dict() for name, f in self.get_files()}
+        return {name: f.to_dict() for name, f in self.get_files()}
 
 
 class CDFH_File():
@@ -90,7 +90,8 @@ class CDFH_File():
         self.extra = formal_chunk(input.read(extra_len))
         self.comment = formal_chunk(input.read(comment_len))
         # Compression Ratio
-        self.ratio = self.uncmpressed / self.compressed if self.compressed != 0 else float('inf')
+        self.ratio = self.uncmpressed / \
+            self.compressed if self.compressed != 0 else float('inf')
 
     def get_header_offset(self) -> int:
         return self.file_offset
@@ -113,25 +114,25 @@ class CDFH_File():
             Name : {self.name},
             Extra : {self.extra},
             COMMENT : {self.comment},
-            Compresssion Ratio : {self.ratio if self.ratio != float('inf') else "NaN"}
+            Compresssion Ratio : {self.ratio if self.ratio != float('inf') else 0}
             {'}'}
         """
         )
 
     def to_dict(self):
         return ({
-            "name" :self.name,
-            "Signature" : self.sig,
-            "Can be extracted by Zip Version" : self.zipexver,
-            "General Purpose Flag" : self.gpflag,
-            "Compression method" : self.cmpmethod,
-            "Last modification time" : self.lastmodtime,
-            "Last modification date" : self.lastmoddate,
-            "CRC of uncompressed data" : self.crc,
-            "Compressed size" : self.compressed,
-            "Uncompressed size" : self.uncmpressed,
-            "Disk Start Index" : self.first_disk_index,
-            "Extra" : self.extra,
-            "COMMENT" : {self.comment},
-            "Compresssion Ratio" : eval(self.ratio if self.ratio != float('inf') else "NaN")
-        })
+            "name": self.name,})
+        #     "Signature": self.sig,
+        #     "Can be extracted by Zip Version": self.zipexver,
+        #     "General Purpose Flag": self.gpflag,
+        #     "Compression method": self.cmpmethod,
+        #     "Last modification time": self.lastmodtime,
+        #     "Last modification date": self.lastmoddate,
+        #     "CRC of uncompressed data": self.crc,
+        #     "Compressed size": self.compressed,
+        #     "Uncompressed size": self.uncmpressed,
+        #     "Disk Start Index": self.first_disk_index,
+        #     "Extra": self.extra,
+        #     "COMMENT": {self.comment},
+        #     "Compresssion Ratio": eval("self.ratio if self.ratio != float('inf') else 0")
+        # })

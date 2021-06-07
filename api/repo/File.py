@@ -53,7 +53,7 @@ class File():
             Uncompressed size : {self.uncmpressed},
             Name : {self.name},
             Extra : {self.extra},
-            Compresssion Ratio : {self.ratio if self.ratio != float('inf') else "NaN"}
+            Compresssion Ratio : {self.ratio if self.ratio != float('inf') else 0}
             {'}'}
         """
         )
@@ -71,5 +71,5 @@ class File():
             "Compressed size" : self.compressed,
             "Uncompressed size" : self.uncmpressed,
             "Extra" : self.extra,
-            "Compresssion Ratio" : eval(self.ratio if self.ratio != float('inf') else "NaN")
+            "Compresssion Ratio" : eval("self.ratio if self.ratio != float('inf') else 0")
         })

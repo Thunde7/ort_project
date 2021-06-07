@@ -6,33 +6,29 @@ import ListItemText from "@material-ui/core/ListItemText";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import PublishIcon from "@material-ui/icons/Publish";
+import AttachmentIcon from "@material-ui/icons/Attachment";
 
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { tokenState } from "../atoms";
-import { useFormik } from 'formik';
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button } from "@material-ui/core";
 
 const uploadDefaults = {
-  filename: "",
   file: "",
-}
+};
 
 const UploadScheme = () =>
   Yup.object().shape({
-    filename: Yup.string().required("Username can't be empty"),
-    file: Yup.string().required("password can't be empty"),
+    file: Yup.string().required("file can't be null"),
   });
 
 export default function SideBar() {
   const history = useHistory();
-  const setToken = useSetRecoilState(tokenState);
 
   const redirectToDash = useCallback(() => {
-    history.push("/dashboard")
-  })
+    history.push("/dashboard");
+  });
 
   const redirectToHome = useCallback(() => {
     console.log("logged out");
@@ -41,24 +37,39 @@ export default function SideBar() {
 
   const deleteJWT = useCallback(() => {
     localStorage.setItem("token", null);
+    localStorage.removeItem("username");
     axios.defaults.headers["Auth"] = null;
-    setToken(null);
     redirectToHome();
   }, []);
 
-  const onSubmit = (async (values) => {
+  const toBase64 = async file => new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = error => reject(error)
+  });
+
+  const onSubmit = async (values) => {
     try {
-      console.log(values);
-    } catch(e) {
-      console.error(e)
+      const formData = new FormData()
+      formData.append("file", values.file)
+      const { status, statusCode, data } = await axios.post("/file-upload/",formData,{
+        headers : {
+          'Content-type': 'multipart/form-data'
+        }
+      }) 
+    } catch (e) {
+      console.error(e);
     }
-  })
+  };
 
   const formik = useFormik({
     validationSchema: UploadScheme,
     initialValues: uploadDefaults,
     onSubmit,
-  })
+  });
+
+  console.log(formik);
 
   return (
     <List>
@@ -68,18 +79,30 @@ export default function SideBar() {
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
       </ListItem>
-      <ListItem form onSubmit={formik.handleSubmit}>
+      <ListItem button onClick={formik.handleSubmit}>
         <ListItemIcon>
           <PublishIcon />
         </ListItemIcon>
-        <Button
-        type="submit"
-        component="label">
-        Upload
-        <input
-        type="file"
-        hidden
-      />
+        <ListItemText primary="Upload" />
+      </ListItem>
+      <ListItem>
+        <Button type="submit" component="label">
+          <ListItemIcon>
+            <AttachmentIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              !!formik.values.file ? formik.values.file.name : "Choose file"
+            }
+          />
+          <input
+            type="file"
+            hidden
+            onChange={(e) => {
+              formik.setFieldTouched("file");
+              formik.setFieldValue("file", e.currentTarget.files[0]);
+            }}
+          />
         </Button>
       </ListItem>
       <ListItem button onClick={deleteJWT}>

@@ -2,11 +2,12 @@ import React from 'react';
 import { useTheme } from '@material-ui/core/styles';
 import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
 import Title from './Title';
+import axios from "axios";
 
-// Generate Sales Data
-function createData(time, amount) {
-  return { time, amount };
+function createData(size, uncompressed) {
+  return { size, uncompressed};
 }
+
 
 const data = [
   createData('00:00', 0),
@@ -23,9 +24,22 @@ const data = [
 export default function Chart() {
   const theme = useTheme();
 
+  const getUploads = React.useCallback(async () => {
+    const { data, status, statusCode } = await axios.get("/user-file-list/",{
+      data: {
+        
+      }
+    })
+    
+    return 5 ;
+  },[]);
+
+  const filename = "sad";
+
+
   return (
     <React.Fragment>
-      <Title>Today</Title>
+      <Title>{filename}</Title>
       <ResponsiveContainer>
         <LineChart
           data={data}
@@ -36,14 +50,14 @@ export default function Chart() {
             left: 24,
           }}
         >
-          <XAxis dataKey="time" stroke={theme.palette.text.secondary} />
+          <XAxis label="Size" stroke={theme.palette.text.secondary} />
           <YAxis stroke={theme.palette.text.secondary}>
             <Label
               angle={270}
               position="left"
               style={{ textAnchor: 'middle', fill: theme.palette.text.primary }}
             >
-              Sales ($)
+              Uncompressed Size(Kb)
             </Label>
           </YAxis>
           <Line type="monotone" dataKey="amount" stroke={theme.palette.primary.main} dot={false} />

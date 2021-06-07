@@ -63,7 +63,6 @@ class EOCD():
     
     def to_dict(self):
         return ({
-            "name" : self.name,
             "signature" : self.sig,
             "Disk Start Index" : self.disk_number,
             "CDFH Disk Start Index" : self.cdfh_start,

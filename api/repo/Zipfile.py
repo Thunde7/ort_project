@@ -108,9 +108,13 @@ class Zipfile():
             return str(self.is_zipbomb())
 
     def to_dict(self):
-        return {"name": self.name, "files": [file.to_dict() for file in self.get_file_list()],
-                "CDFH": self.cdfh.to_dict(), "EOCD": self.eocd.to_dict(), "compressedSize": self.compressed_size,
-                "uncompressedSize": self.uncmprssd_size, "isBomb": str(self.is_zipbomb())}
+        return {"name": self.name,
+                "files": [file.to_dict() for file in self.get_file_list()],
+                "CDFH": self.cdfh.to_dict(),
+                "EOCD": self.eocd.to_dict(), 
+                "compressedSize": self.compressed_size(),
+                "uncompressedSize": self.uncmprssd_size(), 
+                "isBomb": str(self.is_zipbomb())}
 
 
 def main():

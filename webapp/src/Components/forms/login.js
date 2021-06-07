@@ -20,13 +20,6 @@ import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
 import { useHistory } from "react-router-dom";
-import {
-  useRecoilState,
-  useRecoilStateLoadable,
-  useSetRecoilState,
-} from "recoil";
-
-import { tokenState } from "../atoms";
 
 const loginDefault = {
   username: "",
@@ -75,46 +68,44 @@ const useStyles = makeStyles((theme) => ({
 export default function LoginForm() {
   const classes = useStyles();
   const history = useHistory();
-  const setToken = useSetRecoilState(tokenState);
+  const [error, setError] = React.useState("");
 
   const redirectToHome = useCallback(() => {
     console.log("logged in");
     history.push("/dashboard");
   }, []);
 
-  const saveJWT = (token) => {
+  const saveJWT = (token, username) => {
     console.log({ token });
     if (!!token) {
       localStorage.setItem("token", token);
+      localStorage.setItem("username",username)
       axios.defaults.headers["Auth"] = token;
     }
 
-    setToken(token);
     redirectToHome();
   };
 
   const onSubmit = async (values) => {
     try {
       console.log(values);
-
       const { status, data, statusText } = await axios.post("/login/", {
         data: {
           ...values,
         },
       });
-
-      if (status === 200) {
-        saveJWT(data[0]["Auth"]);
-      }
-
-      if (status === 401) {
-        throw new Error(statusText);
-      }
-
-      if (status === 404) {
-        throw new Error(statusText);
-      } else {
-        throw new Error(statusText);
+      switch(status){
+        case 200:
+          saveJWT(data[0]["Auth"], values.username);
+          break;
+        case 401:
+          setError(data)
+        case 404:
+          console.log(data)
+          setError(data)
+        default:
+          setError(data)
+          throw new Error(statusText)
       }
     } catch (e) {
       console.error(e);
@@ -186,6 +177,13 @@ export default function LoginForm() {
             >
               Sign In
             </Button>
+            <Grid item>
+                {!error &&(
+                  <Typography color="red">
+                    {error}
+                  </Typography>
+                )}
+              </Grid>
             <Grid container>
               <Grid item>
                 <Link href="/signup" variant="body2">

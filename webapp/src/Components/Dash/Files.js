@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -9,70 +9,47 @@ import TableRow from "@material-ui/core/TableRow";
 import Title from "./Title";
 import axios from "axios";
 
-async function createData(filename) {
-  try {
-    const { status, data, statusText } = await axios.get("/file-get-report/", {
-      data: {
-        filename,
-      },
-    });
-
-    if (status === 200) {
-      const { name, compressedSize, uncompressedSize, isBomb } = data;
-      return { name, compressedSize, uncompressedSize, isBomb };
-    }
-
-    if (status === 401) {
-      throw new Error(statusText);
-    }
-  } catch (e) {
-    console.log(e);
-    return { name:filename, compressedSize:0, uncompressedSize:0, isBomb:0 }
-  }
-}
-
-async function getFiles() {
-  try {
-    const { status, data, statusText } = await axios.get("/user-file-list/");
-
-    if (status === 200) {
-      let rows = [];
-      let i = 0;
-      data.files.forEach((filename) => {
-        let row =  createData(filename)
-        row["id"] = i;
-        rows.push(row);
-        i++;
-      });
-      return rows;
-    }
-
-    if (status === 401) {
-      throw new Error(statusText);
-    }
-  } catch (e) {
-    console.log(e);
-    return []
-  }
-}
-
-
-function preventDefault(event) {
-  event.preventDefault();
-}
-
 const useStyles = makeStyles((theme) => ({
   seeMore: {
     marginTop: theme.spacing(3),
   },
 }));
 
-export default function Orders() {
+export default function Files() {
   const classes = useStyles();
-  const rows = getFiles();
+  const [rows, setRows] = React.useState([]);
+
+  async function getFiles() {
+    try {
+      const { status, data, statusText } = await axios.get("/file-data-list/", {
+        params: {
+          username: localStorage.getItem("username"),
+        },
+      });
+
+      if (status === 200) {
+        console.log(data.files);
+
+        let files = data.files.map(file => file.metadata)
+        setRows(files)
+      }
+
+      if (status === 401) {
+        throw new Error(statusText);
+      }
+    } catch (e) {
+      console.log(e);
+      setRows([]);
+    }
+  }
+
+  React.useEffect(() => {
+    getFiles();
+  }, [])
+
   return (
     <React.Fragment>
-      <Title>Recent Orders</Title>
+      <Title>Recent Files</Title>
       <Table CompressedSize="small">
         <TableHead>
           <TableRow>
@@ -94,8 +71,8 @@ export default function Orders() {
         </TableBody>
       </Table>
       <div className={classes.seeMore}>
-        <Link color="primary" href="#" onClick={preventDefault}>
-          See more orders
+        <Link color="primary" href="#" onClick={getFiles}>
+          See more files
         </Link>
       </div>
     </React.Fragment>

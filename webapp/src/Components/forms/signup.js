@@ -15,9 +15,6 @@ import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
 import { useHistory } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-
-import { tokenState } from "../atoms";
 
 const signUpDefault = {
   username: "",
@@ -58,7 +55,6 @@ export default function SignUp() {
   const classes = useStyles();
 
   const history = useHistory();
-  const setToken = useSetRecoilState(tokenState);
 
   const redirectToHome = useCallback(() => {
     console.log("Signed up");
@@ -66,13 +62,13 @@ export default function SignUp() {
     history.push("/dashboard");
   }, []);
 
-  const saveJWT = (token) => {
+  const saveJWT = (token, username) => {
     console.log({ token });
     if (!!token) {
       localStorage.setItem("token", token);
+      localStorage.setItem("username",username);
       axios.defaults.headers["Auth"] = token;
     }
-    setToken(token);
     redirectToHome();
   };
 
@@ -87,7 +83,7 @@ export default function SignUp() {
       });
 
       if (status === 200) {
-        saveJWT(data[0]["Auth"]);
+        saveJWT(data[0]["Auth"], values.username);
       }
 
       if (status === 401) {

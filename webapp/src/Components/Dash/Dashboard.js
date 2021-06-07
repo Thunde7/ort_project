@@ -20,21 +20,8 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import SideBar from './SideBar';
 import Chart from './Chart';
-import Deposits from './Deposits';
-import Orders from './Orders';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import Uploads from './Uploads';
+import Files from './Files';
 
 const drawerWidth = 240;
 
@@ -174,12 +161,12 @@ export default function Dashboard() {
             </Grid>
             <Grid item xs={12} md={4} lg={3}>
               <Paper className={fixedHeightPaper}>
-                <Deposits />
+                <Uploads />
               </Paper>
             </Grid>
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                {/* <Orders /> */}
+                <Files />
               </Paper>
             </Grid>
           </Grid>
