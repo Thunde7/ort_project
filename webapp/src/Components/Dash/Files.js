@@ -22,6 +22,9 @@ export default function Files() {
   async function getFiles() {
     try {
       const { status, data, statusText } = await axios.get("/file-data-list/", {
+        headers: {
+          Auth : localStorage.getItem("token")
+        },
         params: {
           username: localStorage.getItem("username"),
         },
@@ -53,9 +56,10 @@ export default function Files() {
       <Table CompressedSize="small">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
+            <TableCell style={{wordWrap:"break-word"}}>Name</TableCell>
             <TableCell>Compressed Size</TableCell>
             <TableCell>Uncompressed Size</TableCell>
+            <TableCell>Compression Ratio</TableCell>
             <TableCell align="right">Zip Bomb?</TableCell>
           </TableRow>
         </TableHead>
@@ -63,8 +67,9 @@ export default function Files() {
           {rows.map((row) => (
             <TableRow key={row.id}>
               <TableCell>{row.name}</TableCell>
-              <TableCell>{row.compressedSize}</TableCell>
-              <TableCell>{row.uncompressedSize}</TableCell>
+              <TableCell align="center">{row.compressedSize}</TableCell>
+              <TableCell align="center">{row.uncompressedSize}</TableCell>
+              <TableCell align="center">{row.ratio}</TableCell>
               <TableCell align="right">{row.isBomb}</TableCell>
             </TableRow>
           ))}
@@ -72,7 +77,7 @@ export default function Files() {
       </Table>
       <div className={classes.seeMore}>
         <Link color="primary" href="#" onClick={getFiles}>
-          See more files
+          Update file list
         </Link>
       </div>
     </React.Fragment>

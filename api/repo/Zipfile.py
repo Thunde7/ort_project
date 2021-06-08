@@ -6,6 +6,7 @@ from os.path import getsize
 from os import sep
 from typing import List
 from functools import lru_cache
+from hurry.filesize import size, si
 
 from repo.EOCD import EOCD
 from repo.CentralDir import CentralDir
@@ -43,6 +44,7 @@ class Zipfile():
         for name, header in self.cdfh.get_files():
             self.files[name] = (header, File(src, header.file_offset))
         self.print_type = print_type
+        self.fullpath = src
 
     def get_file_list(self) -> List[File]:
         return [self.files[name][1] for name in self.files]
@@ -56,17 +58,14 @@ class Zipfile():
 
     @lru_cache
     def compressed_size(self) -> int:
-        size = 0
-        for name in self.files:
-            size += max(map(lambda item: item.compressed, self.files[name]))
-        return size
+        return getsize(self.fullpath)
 
     def is_zipbomb(self) -> Bomb:
         if self.cdfh.check_for_overlaps():
             return Bomb.OVERLAPING_FILES
         if self.cdfh.check_for_same_file_ref():
             return Bomb.SAME_FILE_REF
-        if abs(self.uncmprssd_size() / self.compressed_size() - DEFLATE_LIM) < EPSILON:
+        if abs((self.uncmprssd_size() / self.compressed_size()) - DEFLATE_LIM) < EPSILON:
             return Bomb.BIG_TOTAL_RATIO
         if any(abs(file.get_ratio() - DEFLATE_LIM) < EPSILON for file in self.get_file_list()):
             return Bomb.FILE_WITH_BIG_RATIO
@@ -112,8 +111,11 @@ class Zipfile():
                 "files": [file.to_dict() for file in self.get_file_list()],
                 "CDFH": self.cdfh.to_dict(),
                 "EOCD": self.eocd.to_dict(), 
-                "compressedSize": self.compressed_size(),
-                "uncompressedSize": self.uncmprssd_size(), 
+                "compressedSize": size(self.compressed_size(), system=si) + "b",
+                "uncompressedSize": size(self.uncmprssd_size(), system=si) + 'b',
+                "cmpraw" : self.compressed_size(),
+                "uncpmraw": self.uncmprssd_size(), 
+                "ratio":  "{:.2f}".format(self.uncmprssd_size() / self.compressed_size()),
                 "isBomb": str(self.is_zipbomb())}
 
 

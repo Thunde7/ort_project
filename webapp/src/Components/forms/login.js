@@ -1,18 +1,13 @@
 import React, { useCallback } from "react";
 import {
   Avatar,
-  Box,
   Button,
   CssBaseline,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
   Grid,
   Link,
   Paper,
   TextField,
   Typography,
-  useTheme,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import { makeStyles } from "@material-ui/core/styles";
@@ -68,7 +63,6 @@ const useStyles = makeStyles((theme) => ({
 export default function LoginForm() {
   const classes = useStyles();
   const history = useHistory();
-  const [error, setError] = React.useState("");
 
   const redirectToHome = useCallback(() => {
     console.log("logged in");
@@ -76,11 +70,9 @@ export default function LoginForm() {
   }, []);
 
   const saveJWT = (token, username) => {
-    console.log({ token });
     if (!!token) {
       localStorage.setItem("token", token);
-      localStorage.setItem("username",username)
-      axios.defaults.headers["Auth"] = token;
+      localStorage.setItem("username", username);
     }
 
     redirectToHome();
@@ -94,18 +86,14 @@ export default function LoginForm() {
           ...values,
         },
       });
-      switch(status){
+      switch (status) {
         case 200:
           saveJWT(data[0]["Auth"], values.username);
           break;
         case 401:
-          setError(data)
         case 404:
-          console.log(data)
-          setError(data)
         default:
-          setError(data)
-          throw new Error(statusText)
+          throw new Error(statusText);
       }
     } catch (e) {
       console.error(e);
@@ -177,13 +165,6 @@ export default function LoginForm() {
             >
               Sign In
             </Button>
-            <Grid item>
-                {!error &&(
-                  <Typography color="red">
-                    {error}
-                  </Typography>
-                )}
-              </Grid>
             <Grid container>
               <Grid item>
                 <Link href="/signup" variant="body2">

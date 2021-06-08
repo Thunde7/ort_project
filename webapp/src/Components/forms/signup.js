@@ -63,18 +63,15 @@ export default function SignUp() {
   }, []);
 
   const saveJWT = (token, username) => {
-    console.log({ token });
     if (!!token) {
       localStorage.setItem("token", token);
-      localStorage.setItem("username",username);
-      axios.defaults.headers["Auth"] = token;
+      localStorage.setItem("username", username);
     }
     redirectToHome();
   };
 
   const onSubmit = async (values) => {
     try {
-      console.log(values);
 
       const { status, data, statusText } = await axios.post("/signup/", {
         data: {
@@ -103,8 +100,6 @@ export default function SignUp() {
     initialValues: signUpDefault,
     onSubmit,
   });
-
-  console.log(formik);
 
   return (
     <Container component="main" maxWidth="xs">

@@ -1,14 +1,26 @@
 {
   "files": {
     "a": [
-      {"name": "RavenDB-5.1.6-windows-x64.zip", "date": "2021-06-06"},
-      {"name": "solid.zip" , "date": "2021-06-03"}
+      {
+        "date": "2021-06-06",
+        "name": "RavenDB-5.1.6-windows-x64.zip"
+      },
+      {
+        "date": "2021-06-03",
+        "name": "nexus.zip"
+      }
     ],
-    "king" : [],
     "bomber": [
-      {"name": "zbsm.zip", "date": "2021-02-06"},
-      {"name": "zbsm2.zip", "date": "2021-05-04"}
-    ]
+      {
+        "date": "2021-02-06",
+        "name": "zbsm.zip"
+      },
+      {
+        "date": "2021-05-04",
+        "name": "zbsm2.zip"
+      }
+    ],
+    "king": []
   },
   "users": {
     "a": {

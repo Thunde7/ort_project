@@ -5,10 +5,6 @@ import Typography from "@material-ui/core/Typography";
 import Title from "./Title";
 import axios from "axios";
 
-function preventDefault(event) {
-  event.preventDefault();
-}
-
 const useStyles = makeStyles({
   depositContext: {
     flex: 1,
@@ -22,6 +18,9 @@ export default function Uploads() {
   async function getLatest() {
     try {
       const { status, data, statusText } = await axios.get("/latest-file/", {
+        headers: {
+          Auth : localStorage.getItem("token")
+        },
         params: {
           username: localStorage.getItem("username"),
         },
@@ -53,6 +52,11 @@ export default function Uploads() {
       <Typography color="textSecondary" className={classes.depositContext}>
         {file.date}
       </Typography>
+      <div className={classes.seeMore}>
+        <Link color="primary" href="#" onClick={getLatest}>
+          Update
+        </Link>
+      </div>
     </React.Fragment>
   );
 }

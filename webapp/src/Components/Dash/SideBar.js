@@ -12,7 +12,7 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Button } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 
 const uploadDefaults = {
   file: "",
@@ -38,26 +38,31 @@ export default function SideBar() {
   const deleteJWT = useCallback(() => {
     localStorage.setItem("token", null);
     localStorage.removeItem("username");
-    axios.defaults.headers["Auth"] = null;
     redirectToHome();
   }, []);
 
-  const toBase64 = async file => new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = error => reject(error)
-  });
+  const toBase64 = async (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
 
   const onSubmit = async (values) => {
     try {
-      const formData = new FormData()
-      formData.append("file", values.file)
-      const { status, statusCode, data } = await axios.post("/file-upload/",formData,{
-        headers : {
-          'Content-type': 'multipart/form-data'
+      const {name} = values.file;
+      const b64 = await toBase64(values.file);
+      const { status, statusCode, data } = await axios.post("/file-upload/", {
+        headers: {
+          Auth : localStorage.getItem("token")
+        },
+        data : {
+          username : localStorage.getItem("username"),
+          filename: name,
+          file: b64
         }
-      }) 
+      })
     } catch (e) {
       console.error(e);
     }
@@ -68,8 +73,6 @@ export default function SideBar() {
     initialValues: uploadDefaults,
     onSubmit,
   });
-
-  console.log(formik);
 
   return (
     <List>

@@ -13,7 +13,7 @@ import jwt
 
 app = Flask(__name__)
 api = Api(app, title="BNB API",
-          version="0.1.0",
+          version="1.0.0.26",
           doc='/api/doc/',
           base_url='/')
 CORS(app)
@@ -138,11 +138,12 @@ class Token(Resource):
 class Upload(Resource):
     @api.expect(file_data)
     def post(self):
-        print(request.form)
-        if not check_jwt(request.headers.get("Auth"), request.json["username"]):
+        #print(request.json["data"])
+        data = request.get_json()["data"]
+
+        if not check_jwt(request.headers.get("Auth"), data["username"]):
             return None, 401
 
-        data = request.get_json()
         username = data.get("username")
         filename = data.get("filename")
         rfile = data.get("file")
@@ -164,14 +165,11 @@ class Upload(Resource):
         if os.path.exists(filepath):
             os.remove(filepath)
 
-        file_data = base64.b64decode(rfile)
-
-        with open(filepath, "wb") as f:
-            f.write(file_data)
+        file_data = base64.b64decode(rfile)[27:]
 
         with open(USER_DB, "r") as db:
             data = json.loads(db.read())
-        data["files"][username].append({"name": filename, "date": date.today()})
+        data["files"][username].append({"name": filename, "date": str(date.today())})
 
         with open(USER_DB,"w") as db:
             db.write(json.dumps(data, indent=2))

@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter, Route, Switch, useHistory } from "react-router-dom";
 import axios from "axios";
@@ -8,8 +7,7 @@ import SignUp from "./Components/forms/signup";
 import Dashboard from "./Components/Dash/Dashboard";
 
 axios.defaults.baseURL = "http://127.0.0.1:5000";
-axios.defaults.headers["Access-Control-Allow-Origin"] = "*";
-localStorage.setItem("token", null);
+//localStorage.setItem("token", null);
 
 function Reroute() {
   const history = useHistory();
@@ -33,7 +31,7 @@ function App() {
             <SignUp />
           </Route>
           <Route path="/dashboard">
-            <Dashboard />
+            {!!localStorage.getItem("token") ? <Dashboard /> : <Reroute />}
           </Route>
           <Route path="/">
             <Reroute />
