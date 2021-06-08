@@ -51,18 +51,24 @@ export default function SideBar() {
 
   const onSubmit = async (values) => {
     try {
-      const {name} = values.file;
+      console.log(localStorage.getItem("token"));
+      const { name } = values.file;
       const b64 = await toBase64(values.file);
-      const { status, statusCode, data } = await axios.post("/file-upload/", {
-        headers: {
-          Auth : localStorage.getItem("token")
+      const { status, statusCode, data } = await axios.post(
+        "/file-upload/",
+        {
+          data: {
+            username: localStorage.getItem("username"),
+            filename: name,
+            file: b64,
+          },
         },
-        data : {
-          username : localStorage.getItem("username"),
-          filename: name,
-          file: b64
+        {
+          headers: {
+            Auth: localStorage.getItem("token"),
+          },
         }
-      })
+      );
     } catch (e) {
       console.error(e);
     }

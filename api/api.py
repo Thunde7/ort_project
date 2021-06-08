@@ -138,7 +138,6 @@ class Token(Resource):
 class Upload(Resource):
     @api.expect(file_data)
     def post(self):
-        #print(request.json["data"])
         data = request.get_json()["data"]
 
         if not check_jwt(request.headers.get("Auth"), data["username"]):
@@ -197,7 +196,7 @@ class Latest(Resource):
         with open(USER_DB, "r") as db:
             files = json.load(db)["files"][username]
             print(files)
-            latest = sorted(files,key=lambda f : f["date"], reverse=True)[0]
+            latest = {"name": None, "date": None} if len(files) == 0 else sorted(files,key=lambda f : f["date"], reverse=True)[0]
 
         print(latest)
         return [latest], 200

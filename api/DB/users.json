@@ -1,5 +1,39 @@
 {
   "files": {
+    "DemoUser": [
+      {
+        "date": "2021-06-09",
+        "name": "OneZIp.zip"
+      },
+      {
+        "date": "2021-06-09",
+        "name": "TwoZip.zip"
+      },
+      {
+        "date": "2021-06-09",
+        "name": "ThreeZip.zip"
+      },
+      {
+        "date": "2021-06-09",
+        "name": "FourZip.zip"
+      },
+      {
+        "date": "2021-06-09",
+        "name": "FiveZip.zip"
+      },
+      {
+        "date": "2021-06-09",
+        "name": "SixZip.zip"
+      },
+      {
+        "date": "2021-06-09",
+        "name": "7Zip.zip"
+      },
+      {
+        "date": "2021-06-09",
+        "name": "EightZip.zip"
+      }
+    ],
     "a": [
       {
         "date": "2021-06-06",
@@ -23,6 +57,11 @@
     "king": []
   },
   "users": {
+    "DemoUser": {
+      "firstname": "Hadgama",
+      "lastname": "Test",
+      "password": "d8578edf8458ce06fbc5bb76a58c5ca4"
+    },
     "a": {
       "firstname": "a",
       "lastname": "a",
